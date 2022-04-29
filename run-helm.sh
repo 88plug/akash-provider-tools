@@ -1,43 +1,41 @@
-export KUBECONFIG=kubeconfig
+!/bin/bash
+#This bootstrap makes some assumptions:
+#1 : You have a working Kubernetes cluster and kubeconfig file.
+#2 : A control machine to run this bootstrap from and control your new cluster.  The control machine needs all the dependencies in the depends function.
+#3 : Update the Akash provider wallet settings before running.  You need to name NODE1 and NODE2 with the unique names your cluster uses. `microk8s kubectl get nodes`
 
-#helm uninstall -n akash-services akash-provider || true
+export KUBECONFIG=./kubeconfig
 
-#function cleanup(){
-#export KUBECONFIG=./kubeconfig
+#CLEANUP IF YOU NEED IT
+#kubectl delete ns -l akash.network/lease.id.dseq
 #helm uninstall -n akash-services akash-node || true
 #helm uninstall -n akash-services akash-provider || true
 #helm uninstall -n akash-services hostname-operator || true
 #helm uninstall -n akash-services inventory-operator || true
 #helm uninstall -n ingress-nginx akash-ingress || true
-#kubectl delete ns akash-services --force --grace-period=0
-#kubectl delete ns ingress-nginx --force --grace-period=0
-#kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-#}
-#cleanup
+#kubectl delete ns akash-services
+#kubectl delete ns ingress-nginx
 
-#TYPE=blockchain
-#setup or blockchain
-TYPE=blockchain
-DOMAIN=
-ACCOUNT_ADDRESS=
-KEY_SECRET=
+###Akash Provider Wallet Settings
+TYPE=blockchain #use setup to generate a certificate for the first time or blockchain to use a local certificate
+DOMAIN="domainforakash.com"
+ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
+KEY_SECRET="walletpasswordhere"
 CHAIN_ID=akashnet-2
-MONIKER=xeon-computer-rpc #Unique name for your provider
-REGION="us-central" #us-east, us-west, eu-east, eu-west, etc
-CHIA_PLOTTING=false #Set to true with NVME in RAID > 1TB
-CPU="xeon"
+MONIKER=akt-computer-rpc #Unique name for your provider
+CHAIN_ID=akashnet-2
+REGION="us-west"
+CHIA_PLOTTING=true #Has >1TB NVME storage in RAID0 and/or >512GB Memory
+CPU="amd" #intel or amd
 HOST="akash"
 TIER="community"
-ORG="cryptoandcoffee"
+ORG="any"
 NODE=solo #shared or solo
+
 
 if [[ $NODE == "shared" ]]
 then
-NODE="http://135.181.181.122:28957"
-#NODE="http://akash.c29r3.xyz:80/rpc"
-#NODE="http://rpc.xch.computer:26657"
-#NODE="http://rpc.akash.world:26657"
-#NODE="http://rpc.sfo.computer:26657"
+NODE="http://rpc.akash.world:26657"
 else
 NODE="http://akash-node-1:26657"
 fi
@@ -45,20 +43,19 @@ fi
 helm repo add akash https://ovrclk.github.io/helm-charts
 helm repo update
 
-#Required for cluster creation, do not edit.
 kubectl create ns akash-services
 kubectl label ns akash-services akash.network/name=akash-services akash.network=true
 
 kubectl create ns ingress-nginx
 kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
 
+set -e
 function node(){
-helm upgrade --install akash-node ./akash-helm-charts/charts/akash-node -n akash-services
+helm upgrade --install akash-node ./helm-charts/charts/akash-node -n akash-services --set image.tag="0.16.4-rc0"
 }
 #node
 
-#helm upgrade --install --version $(curl https://api.github.com/repos/ovrclk/helm-charts/releases/latest -s | jq .name -r | cut -d"-" -f2) akash-provider akash/provider \
-helm upgrade --install akash-provider ./akash-helm-charts/charts/akash-provider -n akash-services \
+helm upgrade --install akash-provider ./helm-charts/charts/akash-provider -n akash-services --set image.tag="0.16.4-rc0" \
              --set attributes[0].key=region --set attributes[0].value=$REGION \
              --set attributes[1].key=chia-plotting --set attributes[1].value=$CHIA_PLOTTING \
              --set attributes[2].key=host --set attributes[2].value=$HOST \
@@ -67,24 +64,22 @@ helm upgrade --install akash-provider ./akash-helm-charts/charts/akash-provider 
              --set attributes[5].key=organization --set attributes[5].value=$ORG \
              --set attributes[6].key=network_download --set attributes[6].value="1000" \
              --set attributes[7].key=network_upload --set attributes[7].value="1000" \
-             --set attributes[8].key=status --set attributes[8].value="https://status.$DOMAIN" \
+             --set attributes[8].key=status --set attributes[8].value="https://updown.io/p/qmfr4" \
              --set from=$ACCOUNT_ADDRESS \
              --set key="$(cat ./key.pem | base64)" \
              --set keysecret="$(echo $KEY_SECRET | base64)" \
              --set serverpem="$(cat ./$ACCOUNT_ADDRESS.pem | base64)" \
              --set domain=$DOMAIN \
              --set node=$NODE \
-             --set withdrawalperiod="12h" \
+             --set withdrawalperiod="0h5m" \
              --set gas=auto \
              --set type=$TYPE
 
-
-helm upgrade --install hostname-operator ./akash-helm-charts/charts/hostname-operator -n akash-services
-helm upgrade --install akash-ingress ./akash-helm-charts/charts/akash-nginx -n ingress-nginx --set domain=$DOMAIN
-
+helm upgrade --install hostname-operator akash/hostname-operator -n akash-services --set image.tag="0.16.4-rc0"
+helm upgrade --install akash-ingress akash/akash-ingress -n ingress-nginx --set domain=$DOMAIN --set image.tag="0.16.4-rc0"
 
 kubectl get node -o wide
 kubectl get pods -o wide -n ingress-nginx
 kubectl get pods -o wide -n akash-services
-sleep 5
-kubectl logs -f -n akash-services $(kubectl get pods -A | grep provider | grep Running | awk '{print $2}')
+sleep 10
+kubectl logs -f -n akash-services $(kubectl get pods -A | grep provider | awk '{print $2}')
