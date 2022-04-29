@@ -19,7 +19,7 @@ export KUBECONFIG=./kubeconfig
 ###Akash Provider Wallet Settings
 TYPE=blockchain #use setup to generate a certificate for the first time or blockchain to use a local certificate
 DOMAIN="domainforakash.com"
-ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
+ACCOUNT_ADDRESS=yourakashwalletaddress
 KEY_SECRET="walletpasswordhere"
 CHAIN_ID=akashnet-2
 MONIKER=akt-computer-rpc #Unique name for your provider
