@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 #This bootstrap makes some assumptions:
 #1 : 3 new bare-metal servers/vps/vm's using Debian 11 / must have root user and ssh password login enabled.
 #2 : A control machine with Debian 10/11 that will be seperate from the cluster. You will run this file from the control machine and use it to install Akash onto the cluster.
