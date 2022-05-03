@@ -1,0 +1,8 @@
+#Add a new node
+Update ./run-cluster.sh with a new NODE= and run ./run-cluster.sh
+
+#Remove a failed node before adding a new one
+```
+ansible-playbook -i inventory/akash/hosts.yml remove-node.yml -e "node=node2" -e "reset_nodes=false" -e "allow_ungraceful_removal=true"
+Now update ./run-cluster.sh with new node you want to replace
+```
