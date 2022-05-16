@@ -18,7 +18,8 @@ In a terminal with access to your cluster with kubectl, run: KUBE_EDITOR="nano" 
 
 # Backup and Restore Akash Provider from Storj
 
-## Backup install
+Use Velero and Storj to create snapshot backups.
+
 ```
 velero install --provider tardigrade \
     --plugins storjlabs/velero-plugin \
