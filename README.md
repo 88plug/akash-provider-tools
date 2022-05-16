@@ -15,3 +15,23 @@ In a terminal with access to your cluster with kubectl, run: KUBE_EDITOR="nano" 
         tls_servername tls.cloudflare-dns.com
         health_check 5s
         }
+
+# Backup and Restore Akash Provider from Storj
+
+## Backup install
+```
+velero install --provider tardigrade \
+    --plugins storjlabs/velero-plugin \
+    --bucket provider-backups \
+    --backup-location-config accessGrant=1cCYAHeo6b3QziQe9B9VXKtgBUJ6D6ZbAovEvr2U4DqND9iGTmqrX37NQcugmjDmsgKHs6XbqRyr3RV2RKjFPSrYeQfqJT3mNB8SisU2GsSbRk6rH7ZxEZcEVU5eXZ818dHzbW1pUiFwLVdajt8PkkdvjYi7n8PMj1vrMYeZFE8enqkGqtCPc7CM1QaZDjMmfUAc4Cmb68fLpioZ27LJcrUTtZaFoxqqhFnGh4KTuf2k8AFmUdXZMxdEvKG8Sq7nnMQYk5BUDAyw \
+    --no-secret
+```
+
+## Backup command
+`velero backup create $(hostname)`
+
+## Restore command
+`velero restore create --from-backup $(hostname)`
+
+## Create a daily backup, each living for 90 days (2160 hours).
+`velero create schedule $(hostname) --schedule="@every 24h" --ttl 2160h0m0s`
