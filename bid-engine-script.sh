@@ -1,7 +1,4 @@
 #!/bin/bash
-# WARNING: the runtime of this script should NOT exceed 5 seconds!
-
-set -o pipefail
 data_in=$(jq .)
 cpu_total=$(echo "$data_in" | jq 'map(.cpu * .count) | add')
 memory_gb=$(echo "$data_in" | jq -r '(map(.memory * .count) | add) / pow(1024; 3)')
@@ -30,46 +27,28 @@ chia_bladebit_memory_max=512
 chia_bladebit_storage=512
 chia_bladebit_storage_max=3200
 
-function not_used(){
-if (( $memory_gb >= $chia_bladebit_memory && $memory_gb <= $chia_bladebit_memory_max && $cpu_total_threads >= $chia_bladebit_cpu && $cpu_total_threads <= $chia_bladebit_cpu_max && $hd_gb >= $chia_bladebit_storage && $hd_gb <= $chia_bladebit_storage_max )); then
-#Bladebit detected
-TARGET_CPU="13.09"
-total_cost_usd_target=$(bc -l <<<"($cpu_total_threads * $TARGET_CPU)")
-elif (( $memory_gb >= $chia_madmax_memory && $memory_gb <= $chia_madmax_memory_max && $cpu_total_threads >= $chia_madmax_cpu && $cpu_total_threads <= $chia_madmax_cpu_max && $hd_gb >= $chia_madmax_storage && $hd_gb <= $chia_madmax_storage_max )); then
-#Madmax detected
-TARGET_CPU="5.10"
-total_cost_usd_target=$(bc -l <<<"($cpu_total_threads * $TARGET_CPU)")
-else
-#Normal deployment
-total_cost_usd_target=$(bc -l <<<"(($cpu_total_threads * $TARGET_CPU) + ($memory_gb * $TARGET_MEMORY) + ($hd_gb * $TARGET_HD))")
-echo "0"
-exit 1
-fi
-}
-
 #Bladebit
 if (( $(echo "$memory_gb >= $chia_bladebit_memory" | bc -l) && \
-      $(echo "$memory_gb <= $chia_bladebit_memory_max" | bc -l) && \
-      $(echo "$cpu_total_threads >= $chia_bladebit_cpu" | bc -l) && \
-      $(echo "$cpu_total_threads <= $chia_bladebit_cpu_max" | bc -l) && \
-      $(echo "$hd_gb >= $chia_bladebit_storage" | bc -l) && \
-      $(echo "$hd_gb <= $chia_bladebit_storage_max" | bc -l) )); then
+  $(echo "$memory_gb <= $chia_bladebit_memory_max" | bc -l) && \
+  $(echo "$cpu_total_threads >= $chia_bladebit_cpu" | bc -l) && \
+  $(echo "$cpu_total_threads <= $chia_bladebit_cpu_max" | bc -l) && \
+  $(echo "$hd_gb >= $chia_bladebit_storage" | bc -l) && \
+  $(echo "$hd_gb <= $chia_bladebit_storage_max" | bc -l) )); then
 TARGET_CPU="13.09"
 total_cost_usd_target=$(bc -l <<<"($cpu_total_threads * $TARGET_CPU)")
 #MadMax
 elif (( $(echo "$memory_gb >= $chia_madmax_memory" | bc -l) && \
-      $(echo "$memory_gb <= $chia_madmax_memory_max" | bc -l) && \
-      $(echo "$cpu_total_threads >= $chia_madmax_cpu" | bc -l) && \
-      $(echo "$cpu_total_threads <= $chia_madmax_cpu_max" | bc -l) && \
-      $(echo "$hd_gb >= $chia_madmax_storage" | bc -l) && \
-      $(echo "$hd_gb <= $chia_madmax_storage_max" | bc -l) )); then
+  $(echo "$memory_gb <= $chia_madmax_memory_max" | bc -l) && \
+  $(echo "$cpu_total_threads >= $chia_madmax_cpu" | bc -l) && \
+  $(echo "$cpu_total_threads <= $chia_madmax_cpu_max" | bc -l) && \
+  $(echo "$hd_gb >= $chia_madmax_storage" | bc -l) && \
+  $(echo "$hd_gb <= $chia_madmax_storage_max" | bc -l) )); then
 TARGET_CPU="5.09"
 total_cost_usd_target=$(bc -l <<<"($cpu_total_threads * $TARGET_CPU)")
 else
 #Normal Deployment
 total_cost_usd_target=$(bc -l <<<"(($cpu_total_threads * $TARGET_CPU) + ($memory_gb * $TARGET_MEMORY) + ($hd_gb * $TARGET_HD))")
 fi
-
 
 total_cost_akt_target=$(bc -l <<<"(${total_cost_usd_target}/$usd_per_akt)")
 total_cost_uakt_target=$(bc -l <<<"(${total_cost_akt_target}*1000000)")
