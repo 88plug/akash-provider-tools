@@ -7,9 +7,9 @@ cpu_total_threads=$(echo $cpu_total | awk '{print $1/1000}')
 usd_per_akt=$(curl -s -X GET "https://api.coingecko.com/api/v3/coins/akash-network/tickers" -H  "accept: application/json" | jq '.tickers[] | select(.market.name == "Osmosis").converted_last.usd' | head -n1)
 
 #Price in USD
-TARGET_MEMORY="1.25"
-TARGET_HD="0.37"
-TARGET_CPU="1.15"
+TARGET_MEMORY="0.10"
+TARGET_HD="0.10"
+TARGET_CPU="2.78"
 
 #Chia Madmax Plotter
 chia_madmax_cpu=8
