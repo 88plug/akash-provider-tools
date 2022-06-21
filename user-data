@@ -1,0 +1,84 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: akash-node1
+    password: $6$83rvP4/b9MtfTsWi$BnyxdXLDS0n0y85g0UFwqKc9sAzhNbkWDhtx/RvRBcku5cLOaDBuRO5Q95oCWCCiH2.5O.CjqhWPqwqy0MYyJ0
+    username: akash
+  interactive-sections:
+    - locale
+    - keyboard
+  apt:
+    geoip: true
+  ssh:
+    allow-pw: true
+    install-server: true
+  packages:
+    - open-vm-tools
+    - qemu-guest-agent
+    - bmon
+    - htop
+    - iotop
+    - jq
+    - bc
+    - nano
+  package_update: true
+  package_upgrade: true
+#  snaps:
+#    - name: microk8s
+#      classic: true
+#    - name: helm
+#      classic: true 
+#    - name: kubectl
+#      classic: true
+#  network:
+#    network:
+#      version: 2
+#      ethernets:
+#        eth0:
+#          dhcp4: yes
+#          dhcp-identifier: mac
+#  storage:
+#    layout:
+#      name: direct
+  late-commands:
+#    - swapoff -a
+#    - sed -i '/^\/swap.img/d' /target/etc/fstab
+#    - rm -f /target/swap.img
+#    - echo 'akash ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/akash
+#    - sed -ie 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="net.ifnames=0 ipv6.disable=1 biosdevname=0"/' /target/etc/default/grub
+#    - curtin in-target --target /target update-grub2
+#    - curtin in-target --target=/target -- apt-get --purge -y --quiet=2 remove apport bcache-tools btrfs-progs byobu cloud-guest-utils cloud-initramfs-copymods cloud-initramfs-dyn-netconf friendly-recovery fwupd landscape-common lxd-agent-loader ntfs-3g open-vm-tools plymouth plymouth-theme-ubuntu-text popularity-contest rsync screen snapd sosreport tmux ufw
+#    - curtin in-target --target=/target -- apt-get --purge -y --quiet=2 autoremove
+#    - curtin in-target --target=/target -- apt-get clean
+#Work just slow
+#    - curtin in-target --target=/target -- apt-get -qq update
+#    - curtin in-target --target=/target -- apt-get -y dist-upgrade
+#    - curtin in-target --target=/target -- apt-get --purge -y --quiet=2 autoremove
+#    - curtin in-target --target=/target -- systemctl disable systemd-resolved
+#    - curtin in-target --target=/target -- systemctl stop systemd-resolved 
+#    - curtin in-target --target=/target -- systemctl restart NetworkManager
+#    - curtin in-target --target=/target -- echo "nameserver 1.1.1.1" > /target/etc/resolv.conf
+#    - curtin in-target --target=/target -- echo "nameserver 1.0.0.1" >> /target/etc/resolv.conf
+#    - echo "[main]" > /target/etc/NetworkManager/NetworkManager.conf
+#    - echo "dns=default" >> /target/etc/NetworkManager/NetworkManager.conf
+    - sed -i 's/ENABLED=1/ENABLED=0/' /target/etc/default/motd-news
+    - rm -f /target/etc/update-motd.d/10-help-text
+    - |
+      cat <<EOF | sudo tee /target/etc/profile.d/akash.sh
+      #!/bin/bash
+      cd /home/akash
+      if [ -f ./microk8s-bootstrap.sh ]; then
+        rm ./microk8s-bootstrap.sh
+      fi
+      if [ ! -f variables ]; then
+      wget https://raw.githubusercontent.com/88plug/akash-provider-tools/main/microk8s-bootstrap.sh
+      chmod +x microk8s-bootstrap.sh ; echo "Enter your password to start the Akash installer" ; sudo ./microk8s-bootstrap.sh
+      sudo microk8s kubectl get pods -A -o wide
+      else
+      echo "Variables file deteted - Setup complete"
+      fi
+      EOF
+    - chmod +x /target/etc/profile.d/akash.sh
+  user-data:
+    disable_root: false
