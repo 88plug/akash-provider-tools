@@ -11,18 +11,17 @@ kubectl get pods -A
 }
 depends
 
-function akash(){
+#Install Akash and setup wallet
 curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
 cp bin/akash /usr/local/bin
-rm -rf akash
+rm -rf bin/
 akash version
-akash keys add default --recover
-#(paste mnemonic phrase and give wallet a password)
-akash keys export default
-#(enter new wallet password)
-#(save output to key.pem)
-}
-akash
+read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
+read -p "Enter the new keyring password to protect the wallet with (New@WalletPass): " keyring_
+echo "$mnemonic_" | akash keys add default --recover
+echo "$keyring_ $keyring_" | akash keys export default > key.pem
+cat key.pem
+
 
 function create_config(){
 read -p "Enter domain name to use (example.com): " DOMAIN_
