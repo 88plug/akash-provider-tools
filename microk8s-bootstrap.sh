@@ -5,7 +5,6 @@
 function depends(){
 apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
-microk8s enable dns:1.1.1.1
 export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
 kubectl get pods -A
 }
@@ -50,10 +49,11 @@ echo "UPLOAD=$UPLOAD_" >> variables
 echo "DOWNLOAD=$DOWNLOAD_" >> variables
 
 echo "Get latest config from github"
-wget https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
-wget https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-engine-script.sh
+wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
+wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-engine-script.sh
 chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
 
 ./run-helm-microk8s.sh
 
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
+#Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
