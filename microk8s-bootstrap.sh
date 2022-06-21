@@ -27,14 +27,13 @@ ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d '
 BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
 MIN_BALANCE=50
 
-if (( $(echo "$BALANCE < "50" | bc -l) )); then
-  echo "Balance is less than 50 AKT - you should send more coin to continue."
-  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
-else
-  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
-fi
+#if (( $(echo "$BALANCE < "50" | bc -l) )); then
+#  echo "Balance is less than 50 AKT - you should send more coin to continue."
+#  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
+#else
+#  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
+#fi
 
-function create_config(){
 read -p "Enter domain name to use (example.com) : " DOMAIN_
 read -p "Enter the Keyring password for the Akash wallet : " KEY_SECRET_
 read -p "Enter the region for this server (us-west/eu-east) : " REGION_
@@ -54,12 +53,7 @@ echo "Get latest config from github"
 wget https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
 wget https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-engine-script.sh
 chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
-}
-create_config
 
-function start_akash(){
 ./run-helm-microk8s.sh
-}
-start_akash
 
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
