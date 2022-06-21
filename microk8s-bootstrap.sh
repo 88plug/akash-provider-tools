@@ -17,20 +17,30 @@ cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
 read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
-read -p "Enter the new keyring password to protect the wallet with (New@WalletPass): " keyring_
-echo "$mnemonic_" | akash keys add default --recover
-echo "$keyring_ $keyring_" | akash keys export default > key.pem
-cat key.pem
+read -p "Enter the new keyring password to protect the wallet with (NewWalletPassword): " KEY_SECRET_
 
+echo "$mnemonic_" | akash keys add default --recover
+unset mnemonic_
+echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
+
+ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
+BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
+MIN_BALANCE=50
+
+if (( $(echo "$BALANCE < "50" | bc -l) )); then
+  echo "Balance is less than 50 AKT - you should send more coin to continue.
+  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
+else
+  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
+fi
 
 function create_config(){
-read -p "Enter domain name to use (example.com): " DOMAIN_
-read -p "Enter Akash wallet address : " ACCOUNT_ADDRESS_
+read -p "Enter domain name to use (example.com) : " DOMAIN_
 read -p "Enter the Keyring password for the Akash wallet : " KEY_SECRET_
-read -p "Enter the region for this server (us-west/eu-east) " REGION_
-read -p "Enter the cpu type for this server (amd/intel) " CPU_
-read -p "Enter the download speed of the connection in Mbps (1000) " DOWNLOAD_
-read -p "Enter the upload speed of the connection in Mbps (250) " UPLOAD_
+read -p "Enter the region for this server (us-west/eu-east) : " REGION_
+read -p "Enter the cpu type for this server (amd/intel) : " CPU_
+read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
+read -p "Enter the upload speed of the connection in Mbps (250) : " UPLOAD_
 
 echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
