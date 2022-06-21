@@ -12,11 +12,10 @@ kubectl get pods -A
 depends
 
 function akash(){
-curl https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh -s -- "v0.16.4" 
+curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
 cp bin/akash /usr/local/bin
 rm -rf akash
 akash version
-
 akash keys add default --recover
 #(paste mnemonic phrase and give wallet a password)
 akash keys export default
