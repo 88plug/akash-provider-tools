@@ -1,8 +1,8 @@
 #!/bin/bash
 #To be run on a single microk8s node - to get the base Akash provider software installed.
-#clear
 while true
 do
+clear
 read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
 read -p "Are you sure the provider domain is correct? : \n$DOMAIN_ (y/n)? " choice
 case "$choice" in
@@ -14,6 +14,7 @@ done
 
 while true
 do
+clear
 read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...) : " mnemonic_
 read -p "Are you sure the wallet mnemonic is correct? : \n$mnemonic_ (y/n)? " choice
 case "$choice" in
