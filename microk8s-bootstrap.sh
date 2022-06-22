@@ -26,6 +26,7 @@ DNSOverTLS=yes
 EOF
 systemctl restart systemd-resolved.service
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+microk8s enable dns:1.1.1.1
 
 #Install Akash and setup wallet
 curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
