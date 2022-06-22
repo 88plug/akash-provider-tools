@@ -4,7 +4,7 @@ while true
 do
 clear
 read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
-read -p "Are you sure the provider domain is correct? : \n$DOMAIN_ (y/n)? " choice
+read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
 case "$choice" in
   y|Y ) echo "yes" ; break;;
   n|N ) echo "no";;
@@ -16,7 +16,7 @@ while true
 do
 clear
 read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...) : " mnemonic_
-read -p "Are you sure the wallet mnemonic is correct? : \n$mnemonic_ (y/n)? " choice
+read -p "Are you sure the wallet mnemonic is correct? : $mnemonic_ (y/n)? " choice
 case "$choice" in
   y|Y ) echo "yes" ; break;;
   n|N ) echo "no";;
