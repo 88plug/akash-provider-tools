@@ -103,5 +103,67 @@ chown akash:akash *.sh
 
 ./run-helm-microk8s.sh
  
+while true
+do
+clear
+read -p "Do you have a dynamic or static IP address? : $ip_ (dynamic/static)? " choice
+case "$choice" in
+  dynamic|DYNAMIC ) echo "You chose dynamic IP" ; break;;
+  static|STATIC ) echo "You chose static" ;  break;;
+  * ) echo "invalid";;
+esac
+done 
+
+if [[ $ip_ == "dynamic" ]]; then
+  echo "Dynamic IP Detected"
+  echo "You must use a Dynamic DNS / No-IP service.
+    while true
+    do
+    clear
+    read -p "Enter your dynamic DNS url (akash.no-ip.com) : " DYNAMICIP_
+    read -p "Are you sure the dynamic DNS url is correct? : $DYNAMICIP_ (y/n)? " choice
+    case "$choice" in
+      y|Y ) echo "yes" ; break;;
+      n|N ) echo "no";;
+      * ) echo "invalid";;
+    esac
+    done
+  echo "You must configure your DNS records to match this format and open the following ports"
+  cat <<EOF > ./dns-records.txt
+  *.ingress 300 IN CNAME nodes.$DOMAIN_.
+  nodes 300 IN CNAME $DYNAMICIP_.
+  provider 300 IN CNAME nodes.$DOMAIN_.
+  rpc 300 IN CNAME nodes.$DOMAIN_.
+  EOF
+  cat ./dns-records.txt
+else
+  echo "You must configure your DNS records to match this format and open the following ports"
+  cat <<EOF > ./dns-records.txt
+  *.ingress 300 IN CNAME nodes.$DOMAIN_.
+  nodes 300 IN A X.X.X.X. #IP of this machine and any additional nodes
+  nodes 300 IN A X.X.X.X. #IP of any additional nodes
+  nodes 300 IN A X.X.X.X. #IP of any additional nodes
+  provider 300 IN CNAME nodes.$DOMAIN_.
+  rpc 300 IN CNAME nodes.$DOMAIN_.
+  EOF
+  cat ./dns-records.txt
+fi
+
+echo "Firewall Setup Required" 
+echo "Please forward these ports to the IP of this machine"
+
+cat <<EOF > ./firewall-ports.txt
+8443/tcp - for manifest uploads
+80/tcp - for web app deployments
+443/tcp - for web app deployments
+30000-32767/tcp - for Kubernetes node port range for deployments
+30000-32767/udp - for Kubernetes node port range for deployments
+EOF
+
+cat ./firewall-ports.txt
+
+echo "Setup Complete"
+echo "Verifying Provider Status - TBD"
+
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
 #Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
