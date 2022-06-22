@@ -16,9 +16,7 @@ KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 function depends(){
 apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
-export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
-chmod o-r /var/snap/microk8s/current/credentials/client.config
-chmod g-r /var/snap/microk8s/current/credentials/client.config
+mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
 kubectl get pods -A
 }
 depends
