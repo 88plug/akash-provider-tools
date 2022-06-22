@@ -101,8 +101,9 @@ clear
 cat wallet_qr_code.txt
 ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
 echo "Your new wallet has been created succesfully!"
-echo "You QR code will be available in : wallet_qr_code.txt.  You can use it to send AKT directly to this wallet."
-echo "Your wallet address is : $ACCOUNT_ADDRESS_ as you can always find all your configuration details in the variables file."
+echo "The QR code will be available in : /home/akash/wallet_qr_code.txt.  You can use it to send AKT directly to this wallet."
+echo "Your wallet address is : $ACCOUNT_ADDRESS_"
+echo "Find all your configuration details in /home/akash/variables file."
 sleep 30
 else
 echo "$mnemonic_" | akash keys add default --recover
