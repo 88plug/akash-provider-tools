@@ -1,6 +1,17 @@
 #!/bin/bash
 #To be run on a single microk8s node - to get the base Akash provider software installed.  
 
+read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
+read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
+#read -p "Enter the region for this cluster (us-west/eu-east) : " REGION_
+#read -p "Enter the cpu type for this server (amd/intel) : " CPU_
+#read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
+#read -p "Enter the upload speed of the connection in Mbps (250) : " UPLOAD_
+#read -p "Enter the new keyring password to protect the wallet with (NewWalletPassword): " KEY_SECRET_
+
+#Store securely for user
+KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
+
 #Depends / Microk8s / Kubectl / Helm
 function depends(){
 apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip
@@ -36,8 +47,6 @@ cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
 
-read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
-read -p "Enter the new keyring password to protect the wallet with (NewWalletPassword): " KEY_SECRET_
 
 echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
@@ -54,11 +63,7 @@ MIN_BALANCE=50
 #  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
 #fi
 
-read -p "Enter domain name to use (example.com) : " DOMAIN_
-read -p "Enter the region for this server (us-west/eu-east) : " REGION_
-read -p "Enter the cpu type for this server (amd/intel) : " CPU_
-read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
-read -p "Enter the upload speed of the connection in Mbps (250) : " UPLOAD_
+
 
 echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
@@ -74,6 +79,6 @@ wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-e
 chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
 
 ./run-helm-microk8s.sh
-
+ 
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
 #Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
