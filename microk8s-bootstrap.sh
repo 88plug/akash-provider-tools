@@ -49,7 +49,6 @@ cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
 
-
 echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
@@ -65,8 +64,6 @@ MIN_BALANCE=50
 #  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
 #fi
 
-
-
 echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
 echo "KEY_SECRET=$KEY_SECRET_" >> variables
@@ -79,6 +76,7 @@ echo "Get latest config from github"
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-engine-script.sh
 chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
+chown akash:akash *.sh
 
 ./run-helm-microk8s.sh
  
