@@ -5,7 +5,8 @@
 while true
 do
 clear
-read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available ? : (y/n)? " choice
+read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? : " NEW_WALLET_
+read -p "Are you sure have the mnemonic phrase available? : (y/n)? " choice
 case "$choice" in
   y|Y ) NEW_WALLET=false; break;;
   n|N ) echo "New wallet required during setup" ; NEW_WALLET=true; sleep 5 ; break;;
