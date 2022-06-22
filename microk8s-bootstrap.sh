@@ -6,6 +6,8 @@ function depends(){
 apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
 export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+chmod o-r /var/snap/microk8s/current/credentials/client.config
+chmod g-r /var/snap/microk8s/current/credentials/client.config
 kubectl get pods -A
 }
 depends
