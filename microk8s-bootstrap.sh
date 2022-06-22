@@ -1,7 +1,21 @@
 #!/bin/bash
 #To be run on a single microk8s node - to get the base Akash provider software installed.
-clear
+#clear
+#read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
+while true
+do
 read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
+clear
+read -p "Are you sure the domain is correct? : $DOMAIN_ (y/n)? " choice
+case "$choice" in
+  y|Y ) echo "yes" ; break;;
+  n|N ) echo "no" ; echo "Data and variables exist, must run Akash to use this wallet." ; sleep 5 ; exit;;
+  * ) echo "invalid";;
+esac
+done
+
+echo next
+
 read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
 #read -p "Enter the region for this cluster (us-west/eu-east) : " REGION_
 #read -p "Enter the cpu type for this server (amd/intel) : " CPU_
