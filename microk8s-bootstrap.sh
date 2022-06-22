@@ -5,12 +5,12 @@
 while true
 do
 clear
-read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? : " NEW_WALLET_
-read -p "Are you sure have the mnemonic phrase available? : (y/n)? " choice
+#read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) : " NEW_WALLET_
+read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) " choice
 case "$choice" in
   y|Y ) NEW_WALLET=false; break;;
   n|N ) echo "New wallet required during setup" ; NEW_WALLET=true; sleep 5 ; break;;
-  * ) echo "Invalid entry, please try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
 esac
 done
 
@@ -23,7 +23,7 @@ read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
 case "$choice" in
   y|Y ) break;;
   n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
 esac
 done
 
@@ -37,7 +37,7 @@ read -p "Are you sure the wallet mnemonic is correct? : $mnemonic_ (y/n)? " choi
 case "$choice" in
   y|Y ) break;;
   n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
 esac
 done
 fi
@@ -144,7 +144,7 @@ read -p "Do you have a dynamic or static IP address? : $ip_ (dynamic/static)? " 
 case "$choice" in
   dynamic|DYNAMIC ) echo "You chose dynamic IP" ; break;;
   static|STATIC ) echo "You chose static" ;  break;;
-  * ) echo "invalid";;
+  * ) echo Invalid entry, please try again with dynamic or static";;
 esac
 done 
 
@@ -159,7 +159,7 @@ echo "Dynamic IP Detected"
     case "$choice" in
       y|Y ) break;;
       n|N ) echo "Try again" ; sleep 3;;
-      * ) echo "Invalid entry, please try again" ; sleep 3;;
+      * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
     esac
     done
   echo "You must configure your DNS records to match this format and open the following ports"
