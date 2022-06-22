@@ -4,12 +4,12 @@
 #read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 while true
 do
-read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 clear
-read -p "Are you sure the domain is correct? : $DOMAIN_ (y/n)? " choice
+read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
+read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
 case "$choice" in
   y|Y ) echo "yes" ; break;;
-  n|N ) echo "no" ; echo "Data and variables exist, must run Akash to use this wallet." ; sleep 5 ; exit;;
+  n|N ) echo "no";;
   * ) echo "invalid";;
 esac
 done
