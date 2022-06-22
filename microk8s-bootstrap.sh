@@ -1,12 +1,10 @@
 #!/bin/bash
 #To be run on a single microk8s node - to get the base Akash provider software installed.
 #clear
-#read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 while true
 do
-clear
 read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
-read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
+read -p "Are you sure the provider domain is correct? : \n$DOMAIN_ (y/n)? " choice
 case "$choice" in
   y|Y ) echo "yes" ; break;;
   n|N ) echo "no";;
@@ -14,9 +12,19 @@ case "$choice" in
 esac
 done
 
-echo next
+while true
+do
+read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...) : " mnemonic_
+read -p "Are you sure the wallet mnemonic is correct? : \n$mnemonic_ (y/n)? " choice
+case "$choice" in
+  y|Y ) echo "yes" ; break;;
+  n|N ) echo "no";;
+  * ) echo "invalid";;
+esac
+done
 
-read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
+#read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
+#read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
 #read -p "Enter the region for this cluster (us-west/eu-east) : " REGION_
 #read -p "Enter the cpu type for this server (amd/intel) : " CPU_
 #read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
