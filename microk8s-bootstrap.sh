@@ -53,7 +53,6 @@ MIN_BALANCE=50
 #fi
 
 read -p "Enter domain name to use (example.com) : " DOMAIN_
-read -p "Enter the Keyring password for the Akash wallet : " KEY_SECRET_
 read -p "Enter the region for this server (us-west/eu-east) : " REGION_
 read -p "Enter the cpu type for this server (amd/intel) : " CPU_
 read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
