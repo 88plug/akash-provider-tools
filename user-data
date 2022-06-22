@@ -13,8 +13,8 @@ autoinstall:
   ssh:
     allow-pw: true
     install-server: true
-  package_update: false
-  package_upgrade: false
+  package_update: true
+  package_upgrade: true
   late-commands:
     - sed -i 's/ENABLED=1/ENABLED=0/' /target/etc/default/motd-news
     - rm -f /target/etc/update-motd.d/10-help-text
