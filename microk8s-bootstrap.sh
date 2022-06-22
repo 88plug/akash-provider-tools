@@ -1,17 +1,19 @@
 #!/bin/bash
 #To be run on a single microk8s node - to get the base Akash provider software installed.
 
+#Check what user has
 while true
 do
 clear
 read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available ? : (y/n)? " choice
 case "$choice" in
-  y|Y ) break;;
-  n|N ) echo "New wallet required during setup" ; NEW_WALLET=true; sleep 5;;
+  y|Y ) NEW_WALLET=false; break;;
+  n|N ) echo "New wallet required during setup" ; NEW_WALLET=true; sleep 5 ; break;;
   * ) echo "Invalid entry, please try again" ; sleep 3;;
 esac
 done
 
+#Domain is required
 while true
 do
 clear
@@ -24,6 +26,8 @@ case "$choice" in
 esac
 done
 
+#Import key if the user knows it
+if [[ $NEW_WALLET_ == "false" ]]; then
 while true
 do
 clear
@@ -35,6 +39,8 @@ case "$choice" in
   * ) echo "Invalid entry, please try again" ; sleep 3;;
 esac
 done
+fi
+
 
 #read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 #read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
