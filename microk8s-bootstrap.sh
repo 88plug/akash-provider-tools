@@ -94,8 +94,8 @@ akash version
 
 if [[ $NEW_WALLET == "true" ]]; then
 apt-get install -y qrencode
-echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys add default
-echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
+printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default
+printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys export default > key.pem
 qrencode -t ASCIIi $(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-) > wallet_qr_code.txt
 clear
 cat wallet_qr_code.txt
