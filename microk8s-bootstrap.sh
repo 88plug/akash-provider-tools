@@ -116,7 +116,7 @@ done
 
 if [[ $ip_ == "dynamic" ]]; then
   echo "Dynamic IP Detected"
-  echo "You must use a Dynamic DNS / No-IP service.
+  echo "You must use a Dynamic DNS / No-IP service."
     while true
     do
     clear
