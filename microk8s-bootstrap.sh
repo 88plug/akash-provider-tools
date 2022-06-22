@@ -17,7 +17,11 @@ rm -rf bin/
 akash version
 read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
 read -p "Enter the new keyring password to protect the wallet with (NewWalletPassword): " KEY_SECRET_
-
+read -p "Enter domain name to use (example.com) : " DOMAIN_
+read -p "Enter the region for this server (us-west/eu-east) : " REGION_
+read -p "Enter the cpu type for this server (amd/intel) : " CPU_
+read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
+read -p "Enter the upload speed of the connection in Mbps (1000) : " UPLOAD_
 echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
@@ -33,12 +37,6 @@ MIN_BALANCE=50
 #  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
 #fi
 
-read -p "Enter domain name to use (example.com) : " DOMAIN_
-read -p "Enter the Keyring password for the Akash wallet : " KEY_SECRET_
-read -p "Enter the region for this server (us-west/eu-east) : " REGION_
-read -p "Enter the cpu type for this server (amd/intel) : " CPU_
-read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
-read -p "Enter the upload speed of the connection in Mbps (250) : " UPLOAD_
 
 echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
