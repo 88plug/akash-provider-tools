@@ -14,7 +14,7 @@ KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
 #Depends / Microk8s / Kubectl / Helm
 function depends(){
-apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip
+apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip cloud-utils open-vm-tools qemu-guest-agent bmon htop iotop jq bc nano snapd unzip sudo
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
 #mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; chmod 600 ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
 mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
