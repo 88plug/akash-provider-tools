@@ -1,4 +1,4 @@
-export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+export KUBECONFIG=~/.kube/kubeconfig
 . variables
 #####################################################
 DOMAIN="$DOMAIN"
