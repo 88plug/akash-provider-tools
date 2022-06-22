@@ -6,9 +6,9 @@ clear
 read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
 read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
 case "$choice" in
-  y|Y ) echo "yes" ; break;;
-  n|N ) echo "no";;
-  * ) echo "invalid";;
+  y|Y ) break;;
+  n|N ) echo "Try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again" ; sleep 3;;
 esac
 done
 
@@ -18,9 +18,9 @@ clear
 read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...) : " mnemonic_
 read -p "Are you sure the wallet mnemonic is correct? : $mnemonic_ (y/n)? " choice
 case "$choice" in
-  y|Y ) echo "yes" ; break;;
-  n|N ) echo "no";;
-  * ) echo "invalid";;
+  y|Y ) break;;
+  n|N ) echo "Try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again" ; sleep 3;;
 esac
 done
 
@@ -115,7 +115,7 @@ esac
 done 
 
 if [[ $ip_ == "dynamic" ]]; then
-  echo "Dynamic IP Detected"
+echo "Dynamic IP Detected"
   echo "You must use a Dynamic DNS / No-IP service."
     while true
     do
@@ -123,29 +123,29 @@ if [[ $ip_ == "dynamic" ]]; then
     read -p "Enter your dynamic DNS url (akash.no-ip.com) : " DYNAMICIP_
     read -p "Are you sure the dynamic DNS url is correct? : $DYNAMICIP_ (y/n)? " choice
     case "$choice" in
-      y|Y ) echo "yes" ; break;;
-      n|N ) echo "no";;
-      * ) echo "invalid";;
+      y|Y ) break;;
+      n|N ) echo "Try again" ; sleep 3;;
+      * ) echo "Invalid entry, please try again" ; sleep 3;;
     esac
     done
   echo "You must configure your DNS records to match this format and open the following ports"
-  cat <<EOF > ./dns-records.txt
-  *.ingress 300 IN CNAME nodes.$DOMAIN_.
-  nodes 300 IN CNAME $DYNAMICIP_.
-  provider 300 IN CNAME nodes.$DOMAIN_.
-  rpc 300 IN CNAME nodes.$DOMAIN_.
-  EOF
+cat <<EOF > ./dns-records.txt
+*.ingress 300 IN CNAME nodes.$DOMAIN_.
+nodes 300 IN CNAME $DYNAMICIP_.
+provider 300 IN CNAME nodes.$DOMAIN_.
+rpc 300 IN CNAME nodes.$DOMAIN_.
+EOF
   cat ./dns-records.txt
 else
   echo "You must configure your DNS records to match this format and open the following ports"
-  cat <<EOF > ./dns-records.txt
-  *.ingress 300 IN CNAME nodes.$DOMAIN_.
-  nodes 300 IN A X.X.X.X. #IP of this machine and any additional nodes
-  nodes 300 IN A X.X.X.X. #IP of any additional nodes
-  nodes 300 IN A X.X.X.X. #IP of any additional nodes
-  provider 300 IN CNAME nodes.$DOMAIN_.
-  rpc 300 IN CNAME nodes.$DOMAIN_.
-  EOF
+cat <<EOF > ./dns-records.txt
+*.ingress 300 IN CNAME nodes.$DOMAIN_.
+nodes 300 IN A X.X.X.X. #IP of this machine and any additional nodes
+nodes 300 IN A X.X.X.X. #IP of any additional nodes
+nodes 300 IN A X.X.X.X. #IP of any additional nodes
+provider 300 IN CNAME nodes.$DOMAIN_.
+rpc 300 IN CNAME nodes.$DOMAIN_.
+EOF
   cat ./dns-records.txt
 fi
 
