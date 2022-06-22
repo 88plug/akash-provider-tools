@@ -1,5 +1,17 @@
 #!/bin/bash
 #To be run on a single microk8s node - to get the base Akash provider software installed.
+
+while true
+do
+clear
+read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available ? : (y/n)? " choice
+case "$choice" in
+  y|Y ) break;;
+  n|N ) echo "New wallet required during setup" ; NEW_WALLET=true; sleep 5;;
+  * ) echo "Invalid entry, please try again" ; sleep 3;;
+esac
+done
+
 while true
 do
 clear
@@ -72,9 +84,24 @@ cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
 
+
+if [[ $NEW_WALLET == "true" ]]; then
+apt-get install -y qrencode
+echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys add default
+echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
+qrencode -t ASCIIi $(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-") > wallet_qr_code.txt
+clear
+cat wallet_qr_code.txt
+ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
+echo "Your new wallet has been created succesfully!\n"
+echo "You QR code will be available in : wallet_qr_code.txt.  You can use it to send AKT directly to this wallet.\n"
+echo "Your wallet address is : $ACCOUNT_ADDRESS_ as you can always find all your configuration details in the variables file.\n"
+sleep 30
+else
 echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
+fi
 
 ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
 BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
