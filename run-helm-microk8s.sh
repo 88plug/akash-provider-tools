@@ -1,4 +1,4 @@
-export KUBECONFIG=~/.kube/kubeconfig
+export KUBECONFIG=/home/akash/.kube/kubeconfig
 . variables
 #####################################################
 DOMAIN="$DOMAIN"
