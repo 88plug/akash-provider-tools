@@ -5,14 +5,27 @@
 function depends(){
 apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
-#chmod 600 /var/snap/microk8s/current/credentials/client.config
-#usermod -a -G microk8s akash
-#chown -f -R akash ~/.kube
-#newgrp microk8s
 export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
 kubectl get pods -A
 }
 depends
+
+#Fix Dns
+cat <<EOF > /etc/systemd/resolved.conf
+[Resolve]
+DNS=1.1.1.1 1.0.0.1
+FallbackDNS=8.8.8.10 8.8.8.8
+#Domains=
+#LLMNR=no
+#MulticastDNS=no
+DNSSEC=yes
+DNSOverTLS=yes
+#Cache=yes
+#DNSStubListener=yes
+#ReadEtcHosts=yes
+EOF
+systemctl restart systemd-resolved.service
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 #Install Akash and setup wallet
 curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
