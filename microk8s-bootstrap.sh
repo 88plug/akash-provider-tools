@@ -63,9 +63,10 @@ snap install microk8s --classic ; snap install kubectl --classic ; snap install 
 #chmod 600 /home/akash/.kube/kubeconfig
 #chown akash:akash /home/akash/.kube/kubeconfig
 #export KUBECONFIG=/home/akash/.kube/kubeconfig
+
 echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> /etc/profile
-usermod -aG microk8s $USER
-newgrp microk8s
+#usermod -aG microk8s $USER
+#newgrp microk8s
 microk8s status --wait-ready
 microk8s kubectl get pods -A
 kubectl get pods -A
