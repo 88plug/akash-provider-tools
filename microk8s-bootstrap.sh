@@ -57,7 +57,7 @@ KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 #Depends / Microk8s / Kubectl / Helm
 function depends(){
 apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip cloud-utils open-vm-tools qemu-guest-agent bmon htop iotop jq bc nano snapd unzip sudo
-snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
+snap install microk8s --classic ; snap install helm --classic
 #mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; chmod 600 ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
 mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
 chmod 600 /home/akash/.kube/kubeconfig
@@ -143,8 +143,8 @@ do
 clear
 read -p "Do you have a dynamic or static IP address? : $ip_ (dynamic/static)? " choice
 case "$choice" in
-  dynamic|DYNAMIC ) echo "You chose dynamic IP" ; break;;
-  static|STATIC ) echo "You chose static" ;  break;;
+  dynamic|DYNAMIC ) echo "You chose dynamic IP" ; ip_=dynamic ; break;;
+  static|STATIC ) echo "You chose static" ;  ip_=static ; break;;
   * ) echo "Invalid entry, please try again with dynamic or static";;
 esac
 done 
@@ -196,9 +196,11 @@ cat <<EOF > ./firewall-ports.txt
 EOF
 
 cat ./firewall-ports.txt
+rm -f microk8s-bootstrap.sh
+chown akash:akash *.sh
+chown akash:akash *.txt
 
 echo "Setup Complete"
-echo "Verifying Provider Status - TBD"
 
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
 #Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
