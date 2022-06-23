@@ -56,13 +56,18 @@ KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
 #Depends / Microk8s / Kubectl / Helm
 function depends(){
-apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd sudo unzip cloud-utils open-vm-tools qemu-guest-agent bmon htop iotop jq bc nano snapd unzip sudo
-snap install microk8s --classic ; snap install helm --classic
+apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd unzip cloud-utils open-vm-tools qemu-guest-agent bmon htop iotop jq bc nano snapd unzip sudo
+snap install microk8s --classic ; snap install helm --classic ; snap install kubectl --classic
 #mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; chmod 600 ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
-mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
-chmod 600 /home/akash/.kube/kubeconfig
-chown akash:akash /home/akash/.kube/kubeconfig
-export KUBECONFIG=/home/akash/.kube/kubeconfig
+#mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
+#chmod 600 /home/akash/.kube/kubeconfig
+#chown akash:akash /home/akash/.kube/kubeconfig
+#export KUBECONFIG=/home/akash/.kube/kubeconfig
+echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> /etc/profile
+sudo usermod -aG microk8s $USER
+newgrp microk8s
+microk8s status --wait-ready
+microk8s kubectl get pods -A
 kubectl get pods -A
 }
 depends
@@ -199,6 +204,7 @@ cat ./firewall-ports.txt
 rm -f microk8s-bootstrap.sh
 chown akash:akash *.sh
 chown akash:akash *.txt
+chown akash:akash variables
 
 echo "Setup Complete"
 
