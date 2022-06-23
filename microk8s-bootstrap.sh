@@ -134,6 +134,10 @@ echo "REGION=$REGION_" >> variables
 echo "CPU=$CPU_" >> variables
 echo "UPLOAD=$UPLOAD_" >> variables
 echo "DOWNLOAD=$DOWNLOAD_" >> variables
+echo "KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> variables
+echo "CPU_PRICE=" >> variables
+echo "MEMORY_PRICE=" >> variables
+echo "DISK_PRICE=" >> variables
 
 echo "Get latest config from github"
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
