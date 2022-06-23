@@ -145,7 +145,7 @@ read -p "Do you have a dynamic or static IP address? : $ip_ (dynamic/static)? " 
 case "$choice" in
   dynamic|DYNAMIC ) echo "You chose dynamic IP" ; break;;
   static|STATIC ) echo "You chose static" ;  break;;
-  * ) echo Invalid entry, please try again with dynamic or static";;
+  * ) echo "Invalid entry, please try again with dynamic or static";;
 esac
 done 
 
