@@ -212,6 +212,9 @@ chown akash:akash *.txt
 chown akash:akash variables
 
 echo "Setup Complete"
+echo "Rebooting in 10 seconds..."
+sleep 10
+reboot now
 
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
 #Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
