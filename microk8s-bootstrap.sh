@@ -82,11 +82,12 @@ FallbackDNS=8.8.8.10 8.8.8.8
 DNSSEC=yes
 DNSOverTLS=yes
 #Cache=yes
-#DNSStubListener=yes
+DNSStubListener=no
 #ReadEtcHosts=yes
 EOF
 systemctl restart systemd-resolved.service
-ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+#ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 microk8s enable dns:1.1.1.1
 
 #Install Akash and setup wallet
