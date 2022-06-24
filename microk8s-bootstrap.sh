@@ -56,21 +56,6 @@ KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
 #Depends / Microk8s / Kubectl / Helm
 function depends(){
-apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd unzip cloud-utils open-vm-tools qemu-guest-agent bmon htop iotop jq bc nano snapd unzip sudo
-snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
-#mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; chmod 600 ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
-#mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
-#chmod 600 /home/akash/.kube/kubeconfig
-#chown akash:akash /home/akash/.kube/kubeconfig
-#export KUBECONFIG=/home/akash/.kube/kubeconfig
-
-echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> /etc/profile
-usermod -aG microk8s akash
-#newgrp microk8s
-microk8s kubectl get pods -A
-}
-depends
-
 #Fix Dns
 cat <<EOF > /etc/systemd/resolved.conf
 [Resolve]
@@ -82,13 +67,29 @@ FallbackDNS=8.8.8.10 8.8.8.8
 DNSSEC=yes
 DNSOverTLS=yes
 #Cache=yes
-DNSStubListener=no
+DNSStubListener=yes
 #ReadEtcHosts=yes
 EOF
 systemctl restart systemd-resolved.service
-#ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd unzip cloud-utils open-vm-tools qemu-guest-agent bmon htop iotop jq bc nano snapd unzip sudo
+snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
+#mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; chmod 600 ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
+#mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
+#chmod 600 /home/akash/.kube/kubeconfig
+#chown akash:akash /home/akash/.kube/kubeconfig
+#export KUBECONFIG=/home/akash/.kube/kubeconfig
+chmod 600 /var/snap/microk8s/current/credentials/client.config
+echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> /etc/profile
+usermod -aG microk8s akash
+#newgrp microk8s
+}
+depends
+
+
 microk8s enable dns:1.1.1.1
+microk8s kubectl get pods -A
 
 #Install Akash and setup wallet
 curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
