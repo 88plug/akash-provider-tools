@@ -14,19 +14,6 @@ case "$choice" in
 esac
 done
 
-#Domain is required
-while true
-do
-clear
-read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
-read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
-case "$choice" in
-  y|Y ) break;;
-  n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
-done
-
 #Import key if the user knows it
 if [[ $NEW_WALLET_ == "false" ]]; then
 while true
@@ -42,6 +29,21 @@ esac
 done
 fi
 
+#Domain is required
+while true
+do
+clear
+read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
+read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
+case "$choice" in
+  y|Y ) break;;
+  n|N ) echo "Try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
+esac
+done
+
+
+
 
 #read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 #read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
@@ -56,7 +58,7 @@ KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
 #Depends / Microk8s / Kubectl / Helm
 function depends(){
-#Fix Dns
+#Secure DNS with DOT
 cat <<EOF > /etc/systemd/resolved.conf
 [Resolve]
 DNS=1.1.1.1 1.0.0.1
@@ -80,7 +82,7 @@ snap install microk8s --classic ; snap install kubectl --classic ; snap install 
 #chmod 600 /home/akash/.kube/kubeconfig
 #chown akash:akash /home/akash/.kube/kubeconfig
 #export KUBECONFIG=/home/akash/.kube/kubeconfig
-chmod 600 /var/snap/microk8s/current/credentials/client.config
+#chmod 600 /var/snap/microk8s/current/credentials/client.config
 echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> /etc/profile
 usermod -aG microk8s akash
 #newgrp microk8s
@@ -91,12 +93,14 @@ depends
 microk8s enable dns:1.1.1.1
 microk8s kubectl get pods -A
 
+function install_akash(){
 #Install Akash and setup wallet
 curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
 cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
-
+}
+install_akash
 
 if [[ $NEW_WALLET == "true" ]]; then
 apt-get install -y qrencode
@@ -121,12 +125,13 @@ ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d '
 BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
 MIN_BALANCE=50
 
-#if (( $(echo "$BALANCE < "50" | bc -l) )); then
-#  echo "Balance is less than 50 AKT - you should send more coin to continue."
-#  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
-#else
-#  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
-#fi
+if (( $(echo "$BALANCE < "50"" | bc -l) )); then
+  echo "Balance is less than 50 AKT - you should send more coin to continue."
+  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
+else
+  echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
+fi
+sleep 5
 
 echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
@@ -210,6 +215,9 @@ rm -f microk8s-bootstrap.sh
 chown akash:akash *.sh
 chown akash:akash *.txt
 chown akash:akash variables
+
+#echo "WALLET_FUNDED=0" >> variables
+echo "SETUP_COMPLETE=true" >> variables
 
 echo "Setup Complete"
 echo "Rebooting in 10 seconds..."
