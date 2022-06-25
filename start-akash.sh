@@ -12,10 +12,9 @@ clear
 read -p "Which install should we use (k3s/microk8s/kubespray)? (microk8s) : " METHOD_
 read -p "Are you sure you want to install with the $METHOD_ method? (y/n) " choice
 case "$choice" in
-  microk8s ) break;;
-  kubespray ) break;;
-  k3s ) echo "Not supported yet!  Please choose another option" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with microk8s if unsure" ; sleep 3;;
+  y|Y ) break;;
+  n|N ) echo "Please try again with microk8s if unsure";;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
 esac
 done
 
