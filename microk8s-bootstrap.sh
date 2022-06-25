@@ -8,8 +8,8 @@ clear
 #read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) : " NEW_WALLET_
 read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) " choice
 case "$choice" in
-  y|Y ) NEW_WALLET=false; break;;
-  n|N ) echo "New wallet required during setup" ; NEW_WALLET=true; sleep 5 ; break;;
+  y|Y ) NEW_WALLET_=false; break;;
+  n|N ) echo "New wallet required during setup" ; NEW_WALLET_=true; sleep 5 ; break;;
   * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
 esac
 done
@@ -102,7 +102,7 @@ akash version
 }
 install_akash
 
-if [[ $NEW_WALLET == "true" ]]; then
+if [[ $NEW_WALLET_ == "true" ]]; then
 apt-get install -y qrencode
 printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default
 printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys export default > key.pem
