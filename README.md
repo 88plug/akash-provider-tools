@@ -5,6 +5,12 @@ A collection of tools for setting up / deploying / and managing Kubernetes clust
 
 The best tool to use for cluster uptime monitoring is [UpDown.io](https://updown.io/r/ygC5V).  Here is a reference for how to configure your page: [status.akash.world.](https://status.akash.world).  Follow the instructions on UpDown to configure your status url to : `status.providerdomain.com`
 
+# Excessive kubernetes master pod restarts
+
+https://platform9.com/kb/kubernetes/excessive-kubernetes-master-pod-restarts
+
+Edit `nano /etc/etcd.env` and update `heartbeat-interval` and `election-timeout` to 100 and 1000.
+
 # Enable DNS over TLS for Akash Provider / Cloudflare Secure DNS
 
 On your Kubernetes cluster you need to update coredns with the Cloudflare config.
