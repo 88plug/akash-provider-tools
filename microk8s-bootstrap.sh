@@ -125,7 +125,7 @@ ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d '
 BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
 MIN_BALANCE=50
 
-if (( $(echo "$BALANCE < "50"" | bc -l) )); then
+if (( $(echo "$BALANCE < 50" | bc -l) )); then
   echo "Balance is less than 50 AKT - you should send more coin to continue."
   echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
 else
