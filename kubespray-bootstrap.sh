@@ -165,13 +165,14 @@ echo "KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> variab
 echo "CPU_PRICE=" >> variables
 echo "MEMORY_PRICE=" >> variables
 echo "DISK_PRICE=" >> variables
+. variables
 
 #echo "Now ready for kubespraying"
 #Building array from nodes defined
 declare -a IPS
 readarray -t IPS <<< $(
   env | \
-    grep '^NODE_[[:digit:]]\+=' | sort | cut -d= -f2
+    grep '^NODE[[:digit:]]\+=' | sort | cut -d= -f2
 )
 
 echo "using pools ${IPS[*]}"
