@@ -56,7 +56,6 @@ case "$choice" in
 esac
 done
 
-echo "NODE_1=\4{ens18}@akash" >> variables
 
 if [[ $NODES_REQUIRED_ > 1 ]]; then
 
@@ -65,8 +64,13 @@ for i in $(seq $NODES_REQUIRED_); do
 while true
 do
 clear
+LOCAL_IP=$(ip -4 addr show ens18 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 count=$i
-if [[ $i == 1 ]]; then count=2 && i=2 && echo "NODE_1=\4{ens18}@akash" >> variables fi 
+if [[ $i == 1 ]]; then
+count=2
+i=2
+echo "NODE_1="$LOCAL_IP"@akash" >> variables
+fi
 read -p "What is the IP of the $i node? (x.x.x.x) : " NODE_$i
 read -p "Are you sure the IP address of the $i node is correct? : $NODE_$1 (y/n)? " choice
 case "$choice" in
@@ -77,6 +81,7 @@ esac
 done
 done
 fi
+
 
 #Store securely for user
 KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
