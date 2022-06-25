@@ -114,14 +114,11 @@ snap install kubectl --classic ; snap install helm --classic
 }
 depends
 
-function install_akash(){
 #Install Akash and setup wallet
 curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
 cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
-}
-install_akash
 
 if [[ $NEW_WALLET_ == "true" ]]; then
 apt-get install -y qrencode
