@@ -24,7 +24,7 @@ kubectl create ns ingress-nginx
 kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
 
 #When Github is working...
-helm upgrade --install akash-node akash/akash-node -n akash-services --set image.tag=0.16.4 --set state_sync.enabled=true --set state_sync.rpc1="http://rpc.bigtractorplotting.com:26657" --set state_sync.rpc2="http://rpc.akt.computer:26657" --set peers="25057ddb321b3d389c11e62bd69da194938d5a9e@136.24.44.100:26656"
+helm upgrade --install akash-node akash/akash-node -n akash-services --set image.tag=0.16.4 --set state_sync.enabled=true --set state_sync.rpc1="http://rpc.bigtractorplotting.com:26657" --set state_sync.rpc2="http://rpc.xch.computer:26657"
 
 helm upgrade --install akash-provider akash/provider -n akash-services --set image.tag="0.16.4" \
              --set attributes[0].key=region --set attributes[0].value=$REGION \
