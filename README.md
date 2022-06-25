@@ -5,6 +5,10 @@ A collection of tools for setting up / deploying / and managing Kubernetes clust
 
 The best tool to use for cluster uptime monitoring is [UpDown.io](https://updown.io/r/ygC5V).  Here is a reference for how to configure your page: [status.akash.world.](https://status.akash.world).  Follow the instructions on UpDown to configure your status url to : `status.providerdomain.com`
 
+# Remove a failed node from your cluster
+
+
+
 # Excessive kubernetes master pod restarts
 
 https://platform9.com/kb/kubernetes/excessive-kubernetes-master-pod-restarts
