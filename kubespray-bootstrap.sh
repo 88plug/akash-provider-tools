@@ -50,8 +50,8 @@ clear
 read -p "How many nodes will be in this cluster? (1) : " NODES_REQUIRED_
 read -p "Are you sure the cluster size is correct? : $NODES_REQUIRED_ (y/n)? " choice
 case "$choice" in
-  1 ) echo "NODE_1=\4{ens18}" >> variables ; break;;
-  2|3|4|5|6|7|8|9 ) break;;
+  y|Y ) if [[ $NODES_REQUIRED_ == 1 ]]; then echo "NODE_1=\4{ens18}@akash" >> variables fi; break;;
+  n|N ) echo "Try again" ; sleep 3;;
   * ) echo "Invalid entry, please try again with at least 1 or less than 9" ; sleep 3;;
 esac
 done
@@ -64,7 +64,8 @@ while true
 do
 clear
 count=$i
-read -p "What is the IP of the $i node? (192.168.1.48) : " NODE_$i
+if [[ $i == 1 ]]; then count=2 && i=2 && echo "NODE_1=\4{ens18}@akash" >> variables fi 
+read -p "What is the IP of the $i node? (x.x.x.x) : " NODE_$i
 read -p "Are you sure the IP address of the $i node is correct? : $NODE_$1 (y/n)? " choice
 case "$choice" in
   y|Y ) echo "NODE_$count=NODE_$i" >> variables ; break;;
