@@ -80,6 +80,8 @@ case "$choice" in
 esac
 done
 done
+else
+echo "NODE_1="$LOCAL_IP"@akash" >> variables
 fi
 
 
