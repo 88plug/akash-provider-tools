@@ -56,6 +56,7 @@ case "$choice" in
 esac
 done
 
+LOCAL_IP=$(ip -4 addr show ens18 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
 if [[ $NODES_REQUIRED_ > 1 ]]; then
 
@@ -64,24 +65,23 @@ for i in $(seq $NODES_REQUIRED_); do
 while true
 do
 clear
-LOCAL_IP=$(ip -4 addr show ens18 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 count=$i
 if [[ $i == 1 ]]; then
 count=2
 i=2
-echo "NODE_1="$LOCAL_IP"@akash" >> variables
+echo "NODE1="$LOCAL_IP"@akash" >> variables
 fi
 read -p "What is the IP of the $i node? (x.x.x.x) : " NODE_$i
 read -p "Are you sure the IP address of the $i node is correct? : $NODE_$1 (y/n)? " choice
 case "$choice" in
-  y|Y ) echo "NODE_$count=NODE_$i" >> variables ; break;;
+  y|Y ) echo "NODE$count=NODE$i" >> variables ; break;;
   n|N ) echo "Try again" ; sleep 3;;
   * ) echo "Invalid entry, please try again with at least 1 or less than 9" ; sleep 3;;
 esac
 done
 done
 else
-echo "NODE_1="$LOCAL_IP"@akash" >> variables
+echo "NODE1="$LOCAL_IP"@akash" >> variables
 fi
 
 
