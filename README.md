@@ -39,7 +39,7 @@ Use Velero and Storj to create snapshot backups.
 velero install --provider tardigrade \
     --plugins storjlabs/velero-plugin \
     --bucket provider-backups \
-    --backup-location-config accessGrant=1cCYAHeo6b3QziQe9B9VXKtgBUJ6D6ZbAovEvr2U4DqND9iGTmqrX37NQcugmjDmsgKHs6XbqRyr3RV2RKjFPSrYeQfqJT3mNB8SisU2GsSbRk6rH7ZxEZcEVU5eXZ818dHzbW1pUiFwLVdajt8PkkdvjYi7n8PMj1vrMYeZFE8enqkGqtCPc7CM1QaZDjMmfUAc4Cmb68fLpioZ27LJcrUTtZaFoxqqhFnGh4KTuf2k8AFmUdXZMxdEvKG8Sq7nnMQYk5BUDAyw \
+    --backup-location-config accessGrant=replaceme \
     --no-secret
 ```
 
