@@ -105,7 +105,7 @@ EOF
 systemctl restart systemd-resolved.service
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y cloud-utils open-vm-tools qemu-guest-agent python3-pip git sshpass software-properties-common rsync snapd
+apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y unzip cloud-utils open-vm-tools qemu-guest-agent python3-pip git sshpass software-properties-common rsync snapd
 add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt-get install -y ansible
 git clone https://github.com/kubernetes-sigs/kubespray.git ; cd kubespray
