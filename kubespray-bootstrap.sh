@@ -50,11 +50,13 @@ clear
 read -p "How many nodes will be in this cluster? (1) : " NODES_REQUIRED_
 read -p "Are you sure the cluster size is correct? : $NODES_REQUIRED_ (y/n)? " choice
 case "$choice" in
-  y|Y ) if [[ $NODES_REQUIRED_ == 1 ]]; then echo "NODE_1=\4{ens18}@akash" >> variables fi; break;;
+  y|Y ) break;;
   n|N ) echo "Try again" ; sleep 3;;
   * ) echo "Invalid entry, please try again with at least 1 or less than 9" ; sleep 3;;
 esac
 done
+
+echo "NODE_1=\4{ens18}@akash" >> variables
 
 if [[ $NODES_REQUIRED_ > 1 ]]; then
 
