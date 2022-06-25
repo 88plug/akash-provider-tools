@@ -226,3 +226,10 @@ reboot now
 
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
 #Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
+
+#Todos:
+# Add checkup after install/first start ( 
+# Add watchdog to check for updates
+# Rename "start-akash" for easy user access
+# Convert to simple menu / GUI for easy of use
+# Support additional methods, k3s/kubespray
