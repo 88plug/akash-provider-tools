@@ -29,9 +29,9 @@ You can use this image to takeover any x86 machine or virtual machine that you w
 
 Time Required:
 
-Human Dependencies: ~30 minutes (Acquire at least 50 AKT)
+Human Dependencies: ~30 minutes (Acquire at least 50 AKT/add DNS records/forward ports)
 
-Software Dependencies: ~30 minutes (install Akash OS + configure)
+Software Dependencies: ~30 minutes (install Akash OS + configure pricing)
 
 # Hardware Requirements
 
