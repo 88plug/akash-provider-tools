@@ -1,3 +1,4 @@
+
 # Akash Provider OS  - Ubuntu Server 20.04 Edition
 
 Akash OS is an unattended install of Ubuntu Server that will become the operating system of the machine.  Akash OS will create a Kubernetes cluster and configure it as an Akash provider.
@@ -23,26 +24,25 @@ You can use this image to takeover any x86 machine or virtual machine that you w
 4.  DevOps/SRE/Kubernetes Admins
 5.  Full stack developers
 
-# Difficulty Level
+# Installation Difficulty Level
 
 ## Medium (terminal experience required)
 
-Time Required:
+Human Dependencies: ~30 minutes
 
-Human Dependencies: ~30 minutes (Acquire at least 50 AKT/add DNS records/forward ports)
+  - Acquire at least 50 AKT
+  - Add DNS records
+  - Forward ports
 
-Software Dependencies: ~30 minutes (install Akash OS + configure pricing)
+Software Dependencies: ~30 minutes 
 
-# Hardware Requirements
+- Install Akash OS
+- Configure Pricing
 
-- 2 core / 4 threads
-- 256Mb memory (k3s)
-- 4Gb memory (microk8s/kubespray)
-- 128Gb HD / Disk Drive
 
 # Dependencies
 
-## Human
+## Human Requirements
 1. Be ready to run workloads for dWeb.  Understand what you are getting into and be ready to learn.
 2. Docker and Kubernetes experience will greatly help you, learn all you can.
 3. With great power comes great responsibility. Be aware of the risks and use Lens to monitor your cluster.
@@ -55,6 +55,13 @@ Software Dependencies: ~30 minutes (install Akash OS + configure pricing)
 4. Lens - we recommend Lens for daily ops
 5. Balena Etcher / Rufus / Ventoy
 6. Dynamic DNS update client and domain for residential IP's
+
+## Hardware
+
+- 2 core / 4 threads
+- 256Mb memory (k3s)
+- 4Gb memory (microk8s/kubespray)
+- 128Gb HD / Disk Drive
 
 # Installation Instructions
 Default Username : akash
