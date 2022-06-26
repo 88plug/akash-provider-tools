@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /home/akash
-if [ -f ./*bootstrap.sh ] || ; then
+if [ -f ./*bootstrap.sh ] ; then
   echo "Found an old bootstrap - cleaning up"
   rm ./microk8s-bootstrap.sh ; rm ./k3s-bootstrap.sh ; rm ./kubespray-bootstrap.sh
 fi
