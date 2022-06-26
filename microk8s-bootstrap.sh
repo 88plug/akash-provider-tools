@@ -75,7 +75,7 @@ EOF
 systemctl restart systemd-resolved.service
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y cloud-utils open-vm-tools qemu-guest-agent
+apt-get update && apt-get dist-upgrade -yqq
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
 
 #Disable sleep
