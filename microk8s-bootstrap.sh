@@ -77,6 +77,19 @@ ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
 apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y cloud-utils open-vm-tools qemu-guest-agent
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
+
+#Disable sleep
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+#Disable any messages after login
+touch /home/akash/.hushlogin
+#Disable IPv6
+sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT="maybe-ubiquity"/GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1 maybe-ubiquity"/' /etc/default/grub
+grub-mkconfig -o /boot/grub/grub.cfg
+#Fast reboots
+sed -i -e 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
+systemctl daemon-reload
+
+
 #mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; chmod 600 ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
 #mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
 #chmod 600 /home/akash/.kube/kubeconfig
