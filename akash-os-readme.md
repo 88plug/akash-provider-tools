@@ -2,7 +2,7 @@
 
 Akash OS is an unattended install of Ubuntu Server that will become the operating system of the machine.  Akash OS will create a Kubernetes cluster and configure it as an Akash provider.
 
-Attach ISO to > Provider Host Machine 
+Attach ISO to > Provider Host Machine
 
 # Supported Kubernetes installation methods
 
@@ -18,10 +18,20 @@ You can use this image to takeover any x86 machine or virtual machine that you w
 # Target audience for this ISO - you should be on this list
 
 1.  Hypervisor (Proxmox/VMware)
-2.  Homelab 
-3.  Unraid/TrueNas 
+2.  Homelab
+3.  Unraid/TrueNas
 4.  DevOps/SRE/Kubernetes Admins
 5.  Full stack developers
+
+# Difficulty Level
+
+## Medium (terminal experience required)
+
+Time Required:
+
+Human Dependencies: ~30 minutes (Acquire at least 50 AKT)
+
+Software Dependencies: ~30 minutes (install Akash OS + configure)
 
 # Hardware Requirements
 
@@ -35,7 +45,7 @@ You can use this image to takeover any x86 machine or virtual machine that you w
 ## Human
 1. Be ready to run workloads for dWeb.  Understand what you are getting into and be ready to learn.
 2. Docker and Kubernetes experience will greatly help you, learn all you can.
-3. With great power comes great responsibility. Be aware of the risks and use Lens to monitor your cluster. 
+3. With great power comes great responsibility. Be aware of the risks and use Lens to monitor your cluster.
 4. If you experience any abuse, ddos, spam, or other issues please report the offending wallet address to the Akash team.
 
 ## Software
@@ -47,10 +57,10 @@ You can use this image to takeover any x86 machine or virtual machine that you w
 6. Dynamic DNS update client and domain for residential IP's
 
 # Installation Instructions
-Default Username : akash 
+Default Username : akash
 Default Password : akash
 
-## Installation Instructions VM
+## Proxmox / VirtualBox / VMware
 
 1. Download Akash OS ISO
 2. Create VM - Attach a disk drive with the ISO
@@ -58,15 +68,15 @@ Default Password : akash
 4. Reboot when install completed and detach the ISO.
 6. Login with default username and password, follow the on-screen instructions.
 
-## Installation Instructions Bare Metal Datacenter with IPMI/ISO Support
+## Bare Metal Datacenter with IPMI/ISO Support
 
 1. Download Akash OS ISO
-2. Upload the ISO to the datacenter ISO storage location (Vultr/HostHatch/etc)
+2. Upload the ISO to the datacenter ISO storage location (Vultr/HostHatch/etc) or Attach the ISO to your IPMI Virtual Console Session.
 3. Start the machine with the ISO for the boot drive (F11 may be required)
 4. Reboot when install completed and detach the ISO.
 6. Login with default username and password, follow the on-screen instructions.
 
-## Installation Instructions USB
+## USB Key
 
 1. Download Akash OS ISO
 2. Use Balena Etcher / Rufus / Ventoy to write the ISO to a USB key
@@ -76,6 +86,5 @@ Default Password : akash
 6. Login with default username and password, follow the on-screen instructions.
 
 
-# Difficulty Level
 
-## Medium (terminal experience required)
+
