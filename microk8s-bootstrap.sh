@@ -75,7 +75,7 @@ EOF
 systemctl restart systemd-resolved.service
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y snapd unzip cloud-utils open-vm-tools qemu-guest-agent bmon htop iotop jq bc nano snapd unzip sudo
+apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y cloud-utils open-vm-tools qemu-guest-agent
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
 #mkdir -p ~/.kube ; microk8s config > ~/.kube/kubeconfig ; chmod 600 ~/.kube/kubeconfig ; export KUBECONFIG=~/.kube/kubeconfig
 #mkdir -p /home/akash/.kube ; microk8s config > /home/akash/.kube/kubeconfig
@@ -102,6 +102,7 @@ akash version
 }
 install_akash
 
+function setup_wallet(){
 if [[ $NEW_WALLET_ == "true" ]]; then
 apt-get install -y qrencode
 printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default
@@ -120,7 +121,10 @@ echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
 fi
+}
+setup_wallet
 
+function check_wallet(){
 ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
 BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
 MIN_BALANCE=50
@@ -132,6 +136,8 @@ else
   echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
 fi
 sleep 5
+}
+check_wallet
 
 echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
