@@ -7,6 +7,23 @@ The best tool to use for cluster uptime monitoring is [UpDown.io](https://updown
 
 # Remove a failed node from your cluster
 
+# Change internal ip of microk8s node
+
+On every node (including the master(s)):
+
+    microk8s stop (Stop all nodes before changing configuration files)
+    Get the VPN IP of the node, e.g. 10.x.y.z. Command ip a show dev tun1 will show info for interface tun1.
+    Add this to the bottom of /var/snap/microk8s/current/args/kubelet:
+
+--node-ip=10.x.y.z
+
+    Add this to the bottom of /var/snap/microk8s/current/args/kube-apiserver:
+
+--advertise-address=10.x.y.z
+
+    microk8s start
+
+Now I see the correct values in the INTERNAL-IP column with microk8s kubectl get nodes -o wide.
 
 
 # Excessive kubernetes master pod restarts
