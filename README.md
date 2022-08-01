@@ -68,3 +68,36 @@ velero install --provider tardigrade \
 
 ## Create a daily backup, each living for 90 days (2160 hours).
 `velero create schedule $(hostname) --schedule="@every 24h" --ttl 2160h0m0s`
+
+# Withdraw 
+```
+apt-get install -y bc jq
+export AKASH_OUTPUT=json
+export AKASH_NODE=http://
+PROVIDER=
+
+HEIGHT=$(akash query block | jq -r '.block.header.height')
+akash query market lease list \
+  --provider $PROVIDER \
+  --gseq 0 --oseq 0 \
+  --state active --page 1 --limit 5000 \
+  | jq -r '.leases[].lease | [(.lease_id | .owner, (.dseq|tonumber), (.gseq|tonumber), (.oseq|tonumber), .provider)] | @tsv | gsub("\\t";",")' \
+    | while IFS=, read owner dseq gseq oseq provider; do \
+      REMAINING=$(akash query escrow blocks-remaining --dseq $dseq --owner $owner | jq -r '.balance_remaining')
+      ## FOR DEBUGGING/INFORMATIONAL PURPOSES
+      echo "INFO: $owner/$dseq/$gseq/$oseq balance remaining $REMAINING"
+
+      if (( $(echo "$REMAINING < 0" | bc -l) )); then
+
+        ## UNCOMMENT WHEN READY
+        ( sleep 2s; cat key-pass.txt; cat key-pass.txt ) | akash tx market lease withdraw --provider $provider --owner $owner --dseq $dseq --oseq $oseq --gseq $gseq --gas-prices=0.025uakt --gas=auto --gas-adjustment=1.3 -y --from $provider
+        sleep 10
+        ## TODO: sleep 10 is necessary as a safeguard against account sequence re-use.
+        ## BUG: this script needs NOT to run at the same time provider withdraws the lease.
+
+        ## FOR DEBUGGING PURPOSES, COMMENT WHEN READY
+        #echo "INFO: akash tx market lease withdraw --provider $provider --owner $owner --dseq $dseq --oseq $oseq --gseq $gseq --gas-prices=0.025uakt --gas=auto --gas-adjustment=1.3 -y";
+
+      fi
+      done
+```
