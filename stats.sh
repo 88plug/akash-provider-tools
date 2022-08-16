@@ -2,7 +2,50 @@
 #set -e
 #./payout.sh
 #./close.sh
+
 export KUBECONFIG=./kubeconfig
+
+payouts(){
+export AKASH_OUTPUT=json
+export AKASH_NODE=http://nodes.akash.world:26657
+export AKASH_ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
+export PROVIDER=$AKASH_ACCOUNT_ADDRESS
+export AKASH_KEY_NAME=deploy
+export AKASH_CHAIN_ID=akashnet-2
+
+HEIGHT=$(akash query block | jq -r '.block.header.height')
+akash query market lease list \
+  --provider $PROVIDER \
+  --gseq 0 --oseq 0 \
+  --state active --page 1 --limit 5000 \
+  | jq -r '.leases[].lease | [(.lease_id | .owner, (.dseq|tonumber), (.gseq|tonumber), (.oseq|tonumber), .provider)] | @tsv | gsub("\\t";",")' \
+    | while IFS=, read owner dseq gseq oseq provider; do \
+      REMAINING=$(akash query escrow blocks-remaining --dseq $dseq --owner $owner | jq -r '.balance_remaining')
+      ## FOR DEBUGGING/INFORMATIONAL PURPOSES
+      echo "INFO: $owner/$dseq/$gseq/$oseq balance remaining $REMAINING"
+
+      if (( $(echo "$REMAINING < 0" | bc -l) )); then
+
+        ( sleep 2s; cat key-pass.txt; cat key-pass.txt ) | akash tx market lease withdraw --provider $provider --owner $owner --dseq $dseq --oseq $oseq --gseq $gseq --gas-prices=0.025uakt --gas=auto --gas-adjustment=1.3 -y --from $provider
+        sleep 1
+
+      fi
+      done
+}
+payouts
+
+if ! command -v jq &> /dev/null
+then
+    echo "jq could not be found"
+    exit
+fi
+
+if ! command -v bc &> /dev/null
+then
+    echo "bc could not be found"
+    exit
+fi
+
 
 #Provider monthly cost
 MONTHLY_COST=2000
