@@ -3,7 +3,28 @@
 #./payout.sh
 #./close.sh
 
+#Provider monthly cost
+MONTHLY_COST=2000
+ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
+NODE="http://192.168.1.223:26657"
+local_node_ip="192.168.1.223"
+host="bigtractorplotting.com"
+
 export KUBECONFIG=./kubeconfig
+
+
+if ! command -v jq &> /dev/null
+then
+    echo "jq could not be found"
+    exit
+fi
+
+if ! command -v bc &> /dev/null
+then
+    echo "bc could not be found"
+    exit
+fi
+
 
 payouts(){
 export AKASH_OUTPUT=json
@@ -34,25 +55,61 @@ akash query market lease list \
 }
 payouts
 
-if ! command -v jq &> /dev/null
-then
-    echo "jq could not be found"
-    exit
-fi
+check_cluster(){
 
-if ! command -v bc &> /dev/null
-then
-    echo "bc could not be found"
-    exit
-fi
+export AKASH_NET="https://raw.githubusercontent.com/ovrclk/net/master/mainnet"
+export AKASH_NODE="$(curl -s "$AKASH_NET/rpc-nodes.txt" | shuf -n 1)"
+export AKASH_CHAIN_ID="$(curl -s "$AKASH_NET/chain-id.txt")"
+export AKASH_ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
+export AKASH_NODE=http://nodes.akash.world:26657
 
+md_pfx="akash.network"
+md_lid="$md_pfx/lease.id"
+md_nsn="$md_pfx/namespace"
 
-#Provider monthly cost
-MONTHLY_COST=2000
-ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
-NODE="http://192.168.1.223:26657"
-local_node_ip="192.168.1.223"
-host="bigtractorplotting.com"
+jqexpr="[.[\"$md_nsn\"],.[\"$md_lid.owner\"],.[\"$md_lid.dseq\"],.[\"$md_lid.gseq\"],.[\"$md_lid.oseq\"],.[\"$md_lid.provider\"]]"
+
+nsdata(){
+  kubectl get ns -l "$md_pfx=true,$md_lid.provider" \
+    -o jsonpath='{.items[*].metadata.labels}'
+}
+
+ldata(){
+  jq -rM "$jqexpr | @tsv"
+}
+
+nsdata | ldata | while read -r line; do
+  ns="$(echo "$line" | awk '{print $1}')"
+  owner="$(echo "$line" | awk '{print $2}')"
+  dseq="$(echo "$line" | awk '{print $3}')"
+  gseq="$(echo "$line" | awk '{print $4}')"
+  oseq="$(echo "$line" | awk '{print $5}')"
+  prov="$(echo "$line" | awk '{print $6}')"
+
+  state=$(akash --node=$AKASH_NODE query market lease get --oseq 0 --gseq 0 \
+    --owner "$owner" \
+    --dseq  "$dseq" \
+    --gseq  "$gseq" \
+    --oseq  "$oseq" \
+    --provider "$prov" \
+    -o yaml \
+    | jq -r '.lease.state' \
+  )
+  if [ "$state" == "active" ]; then
+  echo "Found a lease with $owner"
+  fi
+
+  if [ "$state" == "closed" ]; then
+    kubectl delete ns "$ns" --wait=false
+    kubectl delete providerhosts -n lease \
+      --selector="$md_lid.owner=$owner,$md_lid.dseq=$dseq,$md_lid.gseq=$gseq,$md_lid.oseq=$oseq" \
+      --wait=false
+  fi
+done
+
+}
+check_cluster
+
 
 ##Get AKT Price
 curl -s -X GET "https://api.coingecko.com/api/v3/coins/list" -H  "accept: application/json" > coingecko.log
