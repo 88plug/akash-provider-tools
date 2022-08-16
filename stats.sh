@@ -3,13 +3,18 @@
 ##########################################################################################
 ##########################################################################################
 ##########################################################################################
-#Provider monthly cost
+#Wallet Key Name to use - you imported as
 export AKASH_KEY_NAME=deploy
+#Provider monthly cost
 export MONTHLY_COST=2000
+#The RPC node to connect to
 export AKASH_NODE="http://192.168.1.223:26657"
+#Your Akash wallet address
 export AKASH_ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
-export local_node_ip="192.168.1.223"
-export host="bigtractorplotting.com"
+#Your Akash provider DNS name
+export provider_hostname="192.168.1.223"
+#Your AKash provider root domain
+export root_domain_name="bigtractorplotting.com"
 ##########################################################################################
 ##########################################################################################
 ##########################################################################################
@@ -135,13 +140,13 @@ echo "Health Check    "
 echo "####################"
 function health(){
 echo "DNS Health Check"
-[ "$(dig +short -t cname *.ingress.$host.)" ] && echo "DNS *.ingress.$host: *.ingress.$host. is valid"
-[ "$(dig +short -t cname api.$host.)" ] && echo "DNS : api.$host. is valid" || echo "DNS : INVALID DNS CONFIGURATION!"
-[ "$(dig +short -t cname grpc.$host.)" ] && echo "DNS : grpc.$host. is valid"
-[ "$(dig +short -t A nodes.$host)" ] && echo "DNS : nodes.$host is valid"
-[ "$(dig +short -t cname p2p.$host.)" ] && echo "DNS : p2p.$host. is valid"
-[ "$(dig +short -t cname provider.$host.)" ] && echo "DNS : provider.$host. is valid"
-[ "$(dig +short -t cname rpc.$host.)" ] && echo "DNS : rpc.$host. is valid"
+[ "$(dig +short -t cname *.ingress.$root_domain_name.)" ] && echo "DNS *.ingress.$root_domain_name: *.ingress.$root_domain_name. is valid"
+[ "$(dig +short -t cname api.$root_domain_name.)" ] && echo "DNS : api.$root_domain_name. is valid" || echo "DNS : INVALID DNS CONFIGURATION!"
+[ "$(dig +short -t cname grpc.$root_domain_name.)" ] && echo "DNS : grpc.$root_domain_name. is valid"
+[ "$(dig +short -t A nodes.$root_domain_name)" ] && echo "DNS : nodes.$root_domain_name is valid"
+[ "$(dig +short -t cname p2p.$root_domain_name.)" ] && echo "DNS : p2p.$root_domain_name. is valid"
+[ "$(dig +short -t cname provider.$root_domain_name.)" ] && echo "DNS : provider.$root_domain_name. is valid"
+[ "$(dig +short -t cname rpc.$root_domain_name.)" ] && echo "DNS : rpc.$root_domain_name. is valid"
 }
 health
 
@@ -187,11 +192,11 @@ echo "Pod Summary:" >> message.log
 echo "-----------------------------------" >> message.log
 echo "The pod count has changed to $(cat ./total_pods_running.log)" >> message.log
 last=$(cat ./total_pods_running.log)
-leases=$(curl -s -k https://$local_node_ip:8443/status | jq -r .cluster.leases)
-manifest_deployments=$(curl -s -k https://$local_node_ip:8443/status | jq -r .manifest.deployments)
+leases=$(curl -s -k https://$provider_hostname:8443/status | jq -r .cluster.leases)
+manifest_deployments=$(curl -s -k https://$provider_hostname:8443/status | jq -r .manifest.deployments)
 
 echo "$host has $leases leases and $manifest_deployments manifest deployments" >> message.log
-curl -s -k https://$local_node_ip:8443/status > current_status.log
+curl -s -k https://$provider_hostname:8443/status > current_status.log
 
 active_memory=$(cat current_status.log | jq -r .cluster.inventory.active[].memory | awk '{ sum+=$1} END {print sum}')
 active_cpu=$(cat current_status.log | jq -r .cluster.inventory.active[].cpu | awk '{ sum+=$1} END {print sum}')
