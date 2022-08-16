@@ -162,6 +162,9 @@ echo "Skip"
 else
 rm message.log
 
+echo "-----------------------------------" 
+echo "Blockchain:" 
+echo "-----------------------------------" 
 echo "Querying the Akash blockchain for past leases on $AKASH_ACCOUNT_ADDRESS..."
 earned_akt=$(akash query market lease list --node=$AKASH_NODE --provider $AKASH_ACCOUNT_ADDRESS --gseq 0 --oseq 0 --page 1 --limit 10000 -o json | jq -r '([.leases[].escrow_payment.withdrawn.amount|tonumber] | add) / pow(10;6)')
 earned_usd=$(echo "scale=2 ; ($earned_akt * $AKT_PRICE)" | bc)
