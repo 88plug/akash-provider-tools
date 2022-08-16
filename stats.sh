@@ -50,7 +50,7 @@ fi
 
 payouts(){
 echo "-----------------------------------" 
-echo "Leases Balance Check:" >> message.log
+echo "Leases Balance Check:" 
 echo "-----------------------------------" 
 HEIGHT=$(akash query block | jq -r '.block.header.height')
 akash query market lease list \
