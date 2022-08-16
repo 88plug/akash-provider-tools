@@ -4,6 +4,7 @@
 ##########################################################################################
 ##########################################################################################
 #Provider monthly cost
+export AKASH_KEY_NAME=deploy
 export MONTHLY_COST=2000
 export AKASH_NODE="http://192.168.1.223:26657"
 export AKASH_ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
@@ -16,7 +17,6 @@ export host="bigtractorplotting.com"
 ##########################################################################################
 export AKASH_OUTPUT=json
 export PROVIDER=$AKASH_ACCOUNT_ADDRESS
-export AKASH_KEY_NAME=deploy
 export AKASH_CHAIN_ID=akashnet-2
 export AKASH_NET="https://raw.githubusercontent.com/ovrclk/net/master/mainnet"
 export AKASH_NODE="$(curl -s "$AKASH_NET/rpc-nodes.txt" | shuf -n 1)"
@@ -37,6 +37,11 @@ then
     exit
 fi
 
+if ! command -v akash &> /dev/null
+then
+    echo "akash could not be found"
+    exit
+fi
 
 payouts(){
 
