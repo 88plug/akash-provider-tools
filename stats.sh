@@ -140,7 +140,7 @@ while :
 do
 
 echo "-----------------------------------" 
-echo "DNS Health Check:" >> message.log
+echo "DNS Health Check:" 
 echo "-----------------------------------" 
 function health(){
 echo "DNS Health Check"
