@@ -49,7 +49,9 @@ then
 fi
 
 payouts(){
-
+echo "-----------------------------------" 
+echo "Leases Balance Check:" >> message.log
+echo "-----------------------------------" 
 HEIGHT=$(akash query block | jq -r '.block.header.height')
 akash query market lease list \
   --provider $PROVIDER \
@@ -73,7 +75,9 @@ payouts
 
 check_cluster(){
 
-
+echo "-----------------------------------" 
+echo "Leases Cluster Check:" >> message.log
+echo "-----------------------------------" 
 
 
 md_pfx="akash.network"
@@ -135,9 +139,9 @@ AKT_PRICE=$(printf "%.4f" $AKT_PRICE)
 while :
 do
 
-echo "####################"
-echo "Health Check    "
-echo "####################"
+echo "-----------------------------------" 
+echo "DNS Health Check:" >> message.log
+echo "-----------------------------------" 
 function health(){
 echo "DNS Health Check"
 [ "$(dig +short -t cname *.ingress.$root_domain_name.)" ] && echo "DNS *.ingress.$root_domain_name: *.ingress.$root_domain_name. is valid"
