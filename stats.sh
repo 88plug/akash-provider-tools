@@ -1,14 +1,26 @@
 #!/bin/bash
-#set -e
-#./payout.sh
-#./close.sh
-
+#Required Variables
+##########################################################################################
+##########################################################################################
+##########################################################################################
 #Provider monthly cost
-MONTHLY_COST=2000
-ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
-NODE="http://192.168.1.223:26657"
-local_node_ip="192.168.1.223"
-host="bigtractorplotting.com"
+export MONTHLY_COST=2000
+export AKASH_NODE="http://192.168.1.223:26657"
+export AKASH_ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
+export local_node_ip="192.168.1.223"
+export host="bigtractorplotting.com"
+##########################################################################################
+##########################################################################################
+##########################################################################################
+#Do Not Edit Below this Line
+##########################################################################################
+export AKASH_OUTPUT=json
+export PROVIDER=$AKASH_ACCOUNT_ADDRESS
+export AKASH_KEY_NAME=deploy
+export AKASH_CHAIN_ID=akashnet-2
+export AKASH_NET="https://raw.githubusercontent.com/ovrclk/net/master/mainnet"
+export AKASH_NODE="$(curl -s "$AKASH_NET/rpc-nodes.txt" | shuf -n 1)"
+export AKASH_CHAIN_ID="$(curl -s "$AKASH_NET/chain-id.txt")"
 
 export KUBECONFIG=./kubeconfig
 
@@ -27,12 +39,6 @@ fi
 
 
 payouts(){
-export AKASH_OUTPUT=json
-export AKASH_NODE=http://nodes.akash.world:26657
-export AKASH_ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
-export PROVIDER=$AKASH_ACCOUNT_ADDRESS
-export AKASH_KEY_NAME=deploy
-export AKASH_CHAIN_ID=akashnet-2
 
 HEIGHT=$(akash query block | jq -r '.block.header.height')
 akash query market lease list \
@@ -57,11 +63,8 @@ payouts
 
 check_cluster(){
 
-export AKASH_NET="https://raw.githubusercontent.com/ovrclk/net/master/mainnet"
-export AKASH_NODE="$(curl -s "$AKASH_NET/rpc-nodes.txt" | shuf -n 1)"
-export AKASH_CHAIN_ID="$(curl -s "$AKASH_NET/chain-id.txt")"
-export AKASH_ACCOUNT_ADDRESS=akash1wxr49evm8hddnx9ujsdtd86gk46s7ejnccqfmy
-export AKASH_NODE=http://nodes.akash.world:26657
+
+
 
 md_pfx="akash.network"
 md_lid="$md_pfx/lease.id"
@@ -145,11 +148,11 @@ echo "Skip"
 else
 rm message.log
 
-echo "Querying the Akash blockchain for past leases on $ACCOUNT_ADDRESS..."
-earned_akt=$(akash query market lease list --node=$NODE --provider $ACCOUNT_ADDRESS --gseq 0 --oseq 0 --page 1 --limit 10000 -o json | jq -r '([.leases[].escrow_payment.withdrawn.amount|tonumber] | add) / pow(10;6)')
+echo "Querying the Akash blockchain for past leases on $AKASH_ACCOUNT_ADDRESS..."
+earned_akt=$(akash query market lease list --node=$AKASH_NODE --provider $AKASH_ACCOUNT_ADDRESS --gseq 0 --oseq 0 --page 1 --limit 10000 -o json | jq -r '([.leases[].escrow_payment.withdrawn.amount|tonumber] | add) / pow(10;6)')
 earned_usd=$(echo "scale=2 ; ($earned_akt * $AKT_PRICE)" | bc)
-echo "Querying the Akash blockchain for leases on $ACCOUNT_ADDRESS..."
-akash query market lease list --node=$NODE --provider $ACCOUNT_ADDRESS --gseq 0 --oseq 0 --page 1 --limit 1000 --state active -o json | jq -r '["lease-owner","dseq","gseq","oseq","UAKT-block","monthly-AKT-estimate","monthly-USD-estimate", "daily-AKT-estimate", "daily-USD-estimate"], (.leases[] | [(.lease.lease_id | .owner, .dseq, .gseq, .oseq), (.escrow_payment | .rate.amount, (.rate.amount|tonumber), (.rate.amount|tonumber))]) | @csv' | awk -F ',' '{if (NR==1) {$1=$1; printf $0"\n"} else {$6=(($6*((60/6.706)*60*24*30.436875))/10^6); $7=(($7*((60/6.706)*60*24*30.436875))/10^6)*'${AKT_PRICE}'; $8=($6/30.436875); $9=($7/30.436875); print $0}}' | column -t > summary_leases.log
+echo "Querying the Akash blockchain for leases on $AKASH_ACCOUNT_ADDRESS..."
+akash query market lease list --node=$AKASH_NODE --provider $AKASH_ACCOUNT_ADDRESS --gseq 0 --oseq 0 --page 1 --limit 1000 --state active -o json | jq -r '["lease-owner","dseq","gseq","oseq","UAKT-block","monthly-AKT-estimate","monthly-USD-estimate", "daily-AKT-estimate", "daily-USD-estimate"], (.leases[] | [(.lease.lease_id | .owner, .dseq, .gseq, .oseq), (.escrow_payment | .rate.amount, (.rate.amount|tonumber), (.rate.amount|tonumber))]) | @csv' | awk -F ',' '{if (NR==1) {$1=$1; printf $0"\n"} else {$6=(($6*((60/6.706)*60*24*30.436875))/10^6); $7=(($7*((60/6.706)*60*24*30.436875))/10^6)*'${AKT_PRICE}'; $8=($6/30.436875); $9=($7/30.436875); print $0}}' | column -t > summary_leases.log
 
 echo "-----------------------------------" >> message.log
 echo "Leases Summary:" >> message.log
@@ -206,19 +209,6 @@ fillrate_storage=$(echo "scale=0 ; $fillrate_storage" | bc)
 echo "CPU      : ${fillrate_cpu}%" >> message.log
 echo "Memory   : ${fillrate_memory}%" >> message.log
 echo "Storage  : ${fillrate_storage}%" >> message.log
-
-
-#if (( $(echo "$fillrate_cpu > $threshold" | bc -l) )); then
-#echo "Scaling CPU recommended" >> message.log
-#fi
-
-#if (( $(echo "$fillrate_memory > $threshold" | bc -l) )); then
-#echo "Scaling Memory recommended" >> message.log
-#fi
-
-#if (( $(echo "$fillrate_storage > $threshold" | bc -l) )); then
-#echo "Scaling Storage recommended" >> message.log
-#fi
 
 cat message.log
 exit
