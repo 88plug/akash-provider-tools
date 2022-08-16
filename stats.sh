@@ -76,7 +76,7 @@ payouts
 check_cluster(){
 
 echo "-----------------------------------" 
-echo "Leases Cluster Check:" >> message.log
+echo "Leases Cluster Check:" 
 echo "-----------------------------------" 
 
 
