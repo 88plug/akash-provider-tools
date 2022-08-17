@@ -19,8 +19,6 @@ kubectl autoscale deployment -n akash-services hostname-operator --min=1 --max=1
 #kubectl autoscale deployment -n akash-services akash-provider --cpu-percent=50 --min=1 --max=10
 #kubectl autoscale deployment -n akash-services akash-node-1 --cpu-percent=50 --min=1 --max=10
 #kubectl autoscale deployment -n akash-services hostname-operator --cpu-percent=50 --min=1 --max=10
-
-
 ```
 # Cluster status monitoring
 
