@@ -1,6 +1,27 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Enable HPA - never let your provider / node / hostname-operator pods go down!  This will migrate them if a host fails.
+
+```
+#Setup HPA / Easy ! 
+
+kubectl patch deployment -n akash-services akash-provider -p='{"spec":{"template":{"spec":{"containers":[{"name":"akash-provider","resources":{"requests":{"cpu":"1750m"}}}]}}}}'
+kubectl patch deployment -n akash-services akash-node-1 -p='{"spec":{"template":{"spec":{"containers":[{"name":"akash-node","resources":{"requests":{"cpu":"1750m"}}}]}}}}'
+kubectl patch deployment -n akash-services hostname-operator -p='{"spec":{"template":{"spec":{"containers":[{"name":"hostname-operator","resources":{"requests":{"cpu":"500m"}}}]}}}}'
+
+#Default policy
+kubectl autoscale deployment -n akash-services akash-provider --min=1 --max=10
+kubectl autoscale deployment -n akash-services akash-node-1 --min=1 --max=10
+kubectl autoscale deployment -n akash-services hostname-operator --min=1 --max=10
+
+#Scale based on CPU Utilization - if you need it
+#kubectl autoscale deployment -n akash-services akash-provider --cpu-percent=50 --min=1 --max=10
+#kubectl autoscale deployment -n akash-services akash-node-1 --cpu-percent=50 --min=1 --max=10
+#kubectl autoscale deployment -n akash-services hostname-operator --cpu-percent=50 --min=1 --max=10
+
+
+```
 # Cluster status monitoring
 
 The best tool to use for cluster uptime monitoring is [UpDown.io](https://updown.io/r/ygC5V).  Here is a reference for how to configure your page: [status.akash.world.](https://status.akash.world).  Follow the instructions on UpDown to configure your status url to : `status.providerdomain.com`
