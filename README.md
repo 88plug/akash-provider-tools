@@ -6,7 +6,7 @@ A collection of tools for setting up / deploying / and managing Kubernetes clust
 ```
 #Setup HPA / Easy ! 
 
-kubectl patch deployment -n akash-services akash-provider -p='{"spec":{"template":{"spec":{"containers":[{"name":"akash-provider","resources":{"requests":{"cpu":"1750m"}}}]}}}}'
+kubectl patch deployment -n akash-services akash-provider -p='{"spec":{"template":{"spec":{"containers":[{"name":"akash-provider","resources":{"requests":{"cpu":"4000m"}}}]}}}}'
 kubectl patch deployment -n akash-services akash-node-1 -p='{"spec":{"template":{"spec":{"containers":[{"name":"akash-node","resources":{"requests":{"cpu":"1750m"}}}]}}}}'
 kubectl patch deployment -n akash-services hostname-operator -p='{"spec":{"template":{"spec":{"containers":[{"name":"hostname-operator","resources":{"requests":{"cpu":"500m"}}}]}}}}'
 
