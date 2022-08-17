@@ -129,11 +129,37 @@ check_cluster
 
 
 ##Get AKT Price
-curl -s -X GET "https://api.coingecko.com/api/v3/coins/list" -H  "accept: application/json" > coingecko.log
-line=$(cat coingecko.log | jq -cr '.[]  | select(.symbol == "akt") | .id' | head -n1)
-curl -s -X GET "https://api.coingecko.com/api/v3/coins/${line}" > coingecko_dat.log
-AKT_PRICE=$(cat coingecko_dat.log | jq -r '.market_data.current_price.usd')
-AKT_PRICE=$(printf "%.4f" $AKT_PRICE)
+CACHE_FILE=/tmp/aktprice.cache
+if ! test $(find $CACHE_FILE -mmin -60 2>/dev/null); then
+  ## cache expired
+  usd_per_akt=$(curl -s --connect-timeout 3 --max-time 3 -X GET 'https://api-osmosis.imperator.co/tokens/v2/price/AKT' -H 'accept: application/json' | jq -r '.price' 2>/dev/null)
+  if [[ $? -ne 0 ]] || [[ $usd_per_akt == "null" ]] || [[ -z $usd_per_akt ]]; then
+    # if Osmosis API fails, try CoinGecko API
+    usd_per_akt=$(curl -s --connect-timeout 3 --max-time 3 -X GET "https://api.coingecko.com/api/v3/simple/price?ids=akash-network&vs_currencies=usd" -H  "accept: application/json" | jq -r '[.[]][0].usd' 2>/dev/null)
+  fi
+
+  # update the cache only when API returns a result.
+  # this way provider will always keep bidding even if API temporarily breaks (unless pod gets restarted which will clear the cache)
+  if [ ! -z $usd_per_akt ]; then
+    # check price is an integer/floating number
+    re='^[0-9]+([.][0-9]+)?$'
+    if ! [[ $usd_per_akt =~ $re ]]; then
+      exit 1
+    fi
+
+    # make sure price is in the permitted range
+    if ! (( $(echo "$usd_per_akt > 0" | bc -l) && \
+            $(echo "$usd_per_akt <= 1000000" | bc -l) )); then
+      exit 1
+    fi
+
+    echo "$usd_per_akt" > $CACHE_FILE
+  fi
+
+  # TODO: figure some sort of monitoring to inform the provider in the event API breaks
+fi
+
+AKT_PRICE=$(printf "%.4f" $usd_per_akt)
 
 
 while :
