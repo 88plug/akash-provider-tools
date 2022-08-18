@@ -120,3 +120,44 @@ akash query market lease list \
       fi
       done
 ```
+
+# Run an Akash Provider with k3sup + zerotier + helm
+
+1.  Setup mysql/postgres server 
+2.  Setup zerotier account and create a new network
+3.  Join the zerotier network on the machine you plan to run commands from (install plane)
+3.  Install Ubuntu 22.04 on first server (full control plane)
+4.  Install k3sup on install plane
+
+
+Replace Server IP with zerotier IP
+Change tls-san to your load balancer 
+Change node-external-ip to the public IP of the node
+Change node-ip to the $SERVER_IP
+```
+export SERVER_IP=172.22.x.x
+export USER=root
+export datastore="mysql://user:pass@tcp(dbserver:25060)/databasename"
+k3sup install --ip $SERVER_IP --user $USER --datastore $datastore --token yoursupersecretokenthatnobodyknows --no-extras --tls-san balance.x.com --k3s-extra-args '--node-external-ip x.x.x.x --node-ip 172.22.x.x --flannel-iface ztyxa36bu3'
+```
+to add an agent - 
+Install Ubuntu 22.04 and run
+```
+curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && \
+if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | sudo bash; fi
+zerotier-cli join YOURZEROTIERNETWORK
+```
+
+Replace AGENT_IP with zerotier IP
+
+```
+export AGENT_IP=172.22.x.x
+export SERVER_IP=balance.bdl.computer
+export USER=root
+
+k3sup join --user $USER --ip $AGENT_IP --server-host $SERVER_IP --server-ip x.x.x.x --k3s-extra-args '--node-ip 172.22.x.x --flannel-iface ztyxa36bu3'
+```
+
+```
+
+
