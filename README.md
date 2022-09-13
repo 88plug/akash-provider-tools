@@ -1,7 +1,7 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
-# Deploy a cluster of RPC nodes really fast
+# Deploy Akash RPC nodes one liner using Helm Charts. Set your DOMAIN= first.
 
 ```
 DOMAIN=mydomain.com ; helm repo add akash https://ovrclk.github.io/helm-charts ; helm repo update ; kubectl create ns akash-services ; kubectl create ns ingress-nginx ; kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx ; helm upgrade --install akash-ingress akash/akash-ingress -n ingress-nginx --set domain=$DOMAIN ; helm upgrade --install akash-node akash/akash-node -n akash-services --set akash_node.api_enable=true --set akash_node.minimum_gas_prices=0uakt --set image.tag="0.16.4" --set state_sync.enabled=true
