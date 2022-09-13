@@ -1,6 +1,12 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Deploy a cluster of RPC nodes really fast
+
+```
+helm repo add akash https://ovrclk.github.io/helm-charts ; helm repo update ; kubectl create ns akash-services ; helm upgrade --install akash-node akash/akash-node -n akash-services --set akash_node.api_enable=true --set akash_node.minimum_gas_prices=0uakt --set image.tag="0.16.4"
+```
+
 # Enable HPA - never let your provider / node / hostname-operator pods go down!  This will migrate them if a host fails.
 
 ```
