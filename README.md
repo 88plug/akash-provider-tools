@@ -1,6 +1,12 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+
+# Run payouts on your provider - source code for the Docker is under Dockerfile-payouts
+```
+docker run -it -v key.pem:/key.pem --env PROVIDER=yourprovider.com --env PASS=replace_with_key_pass cryptoandcoffee/akash-provider-payout:1
+```
+
 # Deploy Akash RPC nodes one liner using Helm Charts. Set your DOMAIN= first.
 
 ```
