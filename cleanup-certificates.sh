@@ -25,7 +25,7 @@ while true; do
 
     # Do something with the certificate ID and domain
     echo "Certificate ID: ${CERT_ID}"
-    ( sleep 2s; cat key-pass.txt; cat key-pass.txt ) | akash tx cert revoke server --from $AKASH_ACCOUNT_ADDRESS --serial $CERT_ID -y -b async
+    ( sleep 2s; cat key-pass.txt; cat key-pass.txt ) | akash tx cert revoke server --from $AKASH_ACCOUNT_ADDRESS --serial $CERT_ID -y -b block
     exit
   done
 
