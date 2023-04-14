@@ -1,6 +1,10 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+
+# Keep a small node / VPS clean of logs : requires bleachbit
+`(crontab -l | grep -q '0 3 \* \* \* bleachbit --clean system.rotated_logs; bleachbit --clean system.cache; journalctl --vacuum-size=1M; bleachbit --clean apt.\*; k3s crictl rmi --prune' || (apt update && apt --assume-yes install bleachbit) && (crontab -l 2>/dev/null; echo '0 3 * * * bleachbit --clean system.rotated_logs; bleachbit --clean system.cache; journalctl --vacuum-size=1M; bleachbit --clean apt.*; k3s crictl rmi --prune') | crontab -)'
+
 # Enable Security Updates on a node at 6:00am daily using a cronjob / run once during node setup:
 `(crontab -l | grep -q "unattended-upgrades" || (crontab -l ; echo "0 6 * * * unattended-upgrades -d")) | crontab - && if ! dpkg -s unattended-upgrades >/dev/null 2>&1; then apt-get update && apt-get install -y unattended-upgrades; fi && if ! grep -qE '^\"\${distro_id}:\${distro_codename}-security\";' /etc/apt/apt.conf.d/50unattended-upgrades; then sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-security\"/\"\${distro_id}:\${distro_codename}-security\"\;/' /etc/apt/apt.conf.d/50unattended-upgrades; fi && if ! grep -qE '^\"\${distro_id}:\${distro_codename}-updates\";\s*\"\${distro_id}:\${distro_codename}-security\";' /etc/apt/apt.conf.d/50unattended-upgrades; then sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-updates\"/\"\${distro_id}:\${distro_codename}-updates\"\;\n\"\${distro_id}:\${distro_codename}-security\"\;/' /etc/apt/apt.conf.d/50unattended-upgrades; fi && unattended-upgrades -d`
 
