@@ -1,7 +1,7 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
-Enable Security Updates on a node at 6:00am daily using a cronjob :
+# Enable Security Updates on a node at 6:00am daily using a cronjob / run once during node setup:
 `(crontab -l | grep -q "unattended-upgrades" || (crontab -l ; echo "0 6 * * * unattended-upgrades -d")) | crontab - && if ! dpkg -s unattended-upgrades >/dev/null 2>&1; then apt-get update && apt-get install -y unattended-upgrades; fi && if ! grep -qE '^\"\${distro_id}:\${distro_codename}-security\";' /etc/apt/apt.conf.d/50unattended-upgrades; then sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-security\"/\"\${distro_id}:\${distro_codename}-security\"\;/' /etc/apt/apt.conf.d/50unattended-upgrades; fi && if ! grep -qE '^\"\${distro_id}:\${distro_codename}-updates\";\s*\"\${distro_id}:\${distro_codename}-security\";' /etc/apt/apt.conf.d/50unattended-upgrades; then sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-updates\"/\"\${distro_id}:\${distro_codename}-updates\"\;\n\"\${distro_id}:\${distro_codename}-security\"\;/' /etc/apt/apt.conf.d/50unattended-upgrades; fi && unattended-upgrades -d`
 
 # Run payouts on your provider - source code for the Docker is under Dockerfile-payouts
