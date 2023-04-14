@@ -2,7 +2,7 @@
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
 Enable Security Updates on nodes in a one-liner:
-```apt-get update && apt-get install -y unattended-upgrades && sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-security\"/\"\${distro_id}:\${distro_codename}-security\"/' /etc/apt/apt.conf.d/50unattended-upgrades && sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-updates\"/\"\${distro_id}:\${distro_codename}-updates\";\n        \"\${distro_id}:\${distro_codename}-security\";/' /etc/apt/apt.conf.d/50unattended-upgrades && unattended-upgrades --dry-run --debug && unattended-upgrades -d```
+`apt-get update && apt-get install -y unattended-upgrades && sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-security\"/\"\${distro_id}:\${distro_codename}-security\"/' /etc/apt/apt.conf.d/50unattended-upgrades && sed -i 's/^\/\/\s*\"\${distro_id}:\${distro_codename}-updates\"/\"\${distro_id}:\${distro_codename}-updates\";\n        \"\${distro_id}:\${distro_codename}-security\";/' /etc/apt/apt.conf.d/50unattended-upgrades && unattended-upgrades --dry-run --debug && unattended-upgrades -d`
 
 # Run payouts on your provider - source code for the Docker is under Dockerfile-payouts
 ```
