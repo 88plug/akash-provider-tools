@@ -1,6 +1,14 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Upgrade ingress-nginx to new format helm charts
+```
+Create ingress-nginx-custom.yaml
+helm uninstall akash-ingress -n ingress-nginx
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx   --version 4.6.0   --namespace ingress-nginx --create-namespace   -f ingress-nginx-custom.yaml
+kubectl label ingressclass akash-ingress-class akash.network=true
+kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
+ ```
 
 # Keep a small node / VPS clean of logs : requires bleachbit
 `(crontab -l | grep -q '0 3 \* \* \* bleachbit --clean system.rotated_logs; bleachbit --clean system.cache; journalctl --vacuum-size=1M; bleachbit --clean apt.\*; k3s crictl rmi --prune' || (apt update && apt --assume-yes install bleachbit) && (crontab -l 2>/dev/null; echo '0 3 * * * bleachbit --clean system.rotated_logs; bleachbit --clean system.cache; journalctl --vacuum-size=1M; bleachbit --clean apt.*; k3s crictl rmi -a') | crontab -)`
