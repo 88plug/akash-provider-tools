@@ -1,0 +1,24 @@
+controller:
+  service:
+    type: ClusterIP
+  ingressClassResource:
+    name: "akash-ingress-class"
+  kind: DaemonSet
+  hostPort:
+    enabled: true
+  admissionWebhooks:
+    port: 7443
+  config:
+    allow-snippet-annotations: false
+    enable-real-ip: true
+    proxy-buffer-size: "16k"
+  metrics:
+    enabled: true
+  extraArgs:
+    enable-ssl-passthrough: true
+tcp:
+  "1317": "akash-services/akash-node-1:1317"
+  "8443": "akash-services/akash-provider:8443"
+  "9090":  "akash-services/akash-node-1:9090"
+  "26656": "akash-services/akash-node-1:26656"
+  "26657": "akash-services/akash-node-1:26657"
