@@ -5,6 +5,7 @@ A collection of tools for setting up / deploying / and managing Kubernetes clust
 ```
 Create ingress-nginx-custom.yaml
 helm uninstall akash-ingress -n ingress-nginx
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx   --version 4.6.0   --namespace ingress-nginx --create-namespace   -f ingress-nginx-custom.yaml
 kubectl label ingressclass akash-ingress-class akash.network=true
 kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
