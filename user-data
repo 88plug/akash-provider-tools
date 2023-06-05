@@ -31,7 +31,7 @@ autoinstall:
       sudo microk8s kubectl get pods -A -o wide
       else
       export KUBECONFIG=/home/akash/.kube/kubeconfig
-      echo "Variables file deteted - Setup complete"
+      echo "Variables file detected - Setup complete"
       sudo microk8s kubectl get pods -A -o wide
       fi
       EOF
@@ -49,3 +49,6 @@ autoinstall:
     - chmod +x /target/etc/profile.d/akash.sh
   user-data:
     disable_root: false
+
+runcmd:
+  - sed -i '/network-info/d' /etc/cloud/cloud.cfg
