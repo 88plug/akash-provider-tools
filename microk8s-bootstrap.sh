@@ -108,12 +108,22 @@ microk8s kubectl get pods -A
 
 function install_akash(){
 #Install Akash and setup wallet
-curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
+curl -sSfL https://raw.githubusercontent.com/akash-network/node/master/install.sh | sh
 cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
 }
 install_akash
+
+function install_akash_provider(){
+curl -sfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | bash
+cp bin/provider-services /usr/local/bin
+rm -rf bin/
+akash version
+}
+install_akash_provider
+
+
 
 function setup_wallet(){
 if [[ $NEW_WALLET_ == "true" ]]; then
