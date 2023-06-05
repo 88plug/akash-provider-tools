@@ -39,7 +39,7 @@ run_bootstrap() {
 
 main() {
     cleanup_bootstrap
-
+    clear
     if [ ! -f variables ]; then
         while true; do
             read -p "Which Kubernetes install method would you like to use (k3s/microk8s/kubespray)? (microk8s): " method
