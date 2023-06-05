@@ -75,6 +75,7 @@ EOF
 systemctl restart systemd-resolved.service
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
+export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get dist-upgrade -yqq
 snap install microk8s --classic ; snap install kubectl --classic ; snap install helm --classic
 
