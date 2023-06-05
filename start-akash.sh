@@ -39,7 +39,6 @@ run_bootstrap() {
 
 main() {
     cleanup_bootstrap
-    clear
     if [ ! -f variables ]; then
         while true; do
             read -p "Which Kubernetes install method would you like to use (k3s/microk8s/kubespray)? (microk8s): " method
@@ -62,7 +61,6 @@ main() {
         done
     else
         source variables
-
         if [[ $SETUP_COMPLETE == true ]]; then
             export KUBECONFIG=/home/akash/.kube/kubeconfig
             echo "Variables file detected - Setup complete"
