@@ -13,20 +13,20 @@ TIER="community"
 NODE="http://akash-node-1:26657"
 #####################################################
 
-helm repo add akash https://ovrclk.github.io/helm-charts
+helm repo add akash https://akash-network.github.io/helm-charts
 helm repo update
 
 #Required for cluster creation, do not edit.
 kubectl create ns akash-services
 kubectl label ns akash-services akash.network/name=akash-services akash.network=true
 
-kubectl create ns ingress-nginx
-kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
+kubectl create ns lease
+kubectl label ns lease akash.network=true
 
 #When Github is working...
-helm upgrade --install akash-node akash/akash-node -n akash-services --set image.tag=0.16.4 --set state_sync.enabled=true --set state_sync.rpc1="http://rpc.bigtractorplotting.com:26657" --set state_sync.rpc2="http://rpc.xch.computer:26657"
+helm upgrade --install akash-node akash/akash-node -n akash-services
 
-helm upgrade --install akash-provider akash/provider -n akash-services --set image.tag="0.16.4" \
+helm upgrade --install akash-provider akash/provider -n akash-services \
              --set attributes[0].key=region --set attributes[0].value=$REGION \
              --set attributes[1].key=chia-plotting --set attributes[1].value=$CHIA_PLOTTING \
              --set attributes[2].key=host --set attributes[2].value=$HOST \
@@ -42,5 +42,47 @@ helm upgrade --install akash-provider akash/provider -n akash-services --set ima
              --set bidpricescript="$(cat bid-engine-script.sh | openssl base64 -A)" \
              --set node=$NODE
 
-helm upgrade --install hostname-operator akash/hostname-operator -n akash-services --set image.tag="0.16.4"
-helm upgrade --install akash-ingress akash/akash-ingress -n ingress-nginx --set domain=$DOMAIN --set image.tag="0.16.4"
+
+helm upgrade --install akash-hostname-operator akash/akash-hostname-operator -n akash-services
+
+ingress_charts(){
+cat > ingress-nginx-custom.yaml << EOF
+controller:
+  service:
+    type: ClusterIP
+  ingressClassResource:
+    name: "akash-ingress-class"
+  kind: DaemonSet
+  hostPort:
+    enabled: true
+  admissionWebhooks:
+    port: 7443
+  config:
+    allow-snippet-annotations: false
+    enable-real-ip: true
+    proxy-buffer-size: "16k"
+  metrics:
+    enabled: true
+  extraArgs:
+    enable-ssl-passthrough: true
+tcp:
+  "1317": "akash-services/akash-node-1:1317"
+  "8443": "akash-services/akash-provider:8443"
+  "9090":  "akash-services/akash-node-1:9090"
+  "26656": "akash-services/akash-node-1:26656"
+  "26657": "akash-services/akash-node-1:26657"
+EOF
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+  --version 4.6.0 \
+  --namespace ingress-nginx --create-namespace \
+  -f ingress-nginx-custom.yaml
+  
+kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
+kubectl label ingressclass akash-ingress-class akash.network=true
+
+}
+ingress_charts
