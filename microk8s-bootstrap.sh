@@ -149,7 +149,7 @@ setup_wallet
 
 function check_wallet(){
 ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
-BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
+BALANCE=$(akash query bank balances --node https://akash-rpc.global.ssl.fastly.net:443 $ACCOUNT_ADDRESS_)
 MIN_BALANCE=50
 
 if (( $(echo "$BALANCE < 50" | bc -l) )); then
