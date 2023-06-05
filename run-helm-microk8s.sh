@@ -13,19 +13,29 @@ TIER="community"
 NODE="http://akash-node-1:26657"
 #####################################################
 
+# Akash Helm Charts
 helm repo add akash https://akash-network.github.io/helm-charts
 helm repo update
 
-#Required for cluster creation, do not edit.
+# Required for cluster creation, do not edit.
 kubectl create ns akash-services
 kubectl label ns akash-services akash.network/name=akash-services akash.network=true
-
 kubectl create ns lease
 kubectl label ns lease akash.network=true
 
-#When Github is working...
-helm upgrade --install akash-node akash/akash-node -n akash-services
+# Node
+helm upgrade --install akash-node akash/akash-node -n akash-services \
+  --set akash_node.api_enable=true \
+  --set akash_node.minimum_gas_prices=0uakt \
+  --set state_sync.enabled=false \
+  --set akash_node.snapshot_provider=polkachu \
+  --set nodeSelector.node-type=akash-node \
+  --set resources.limits.cpu="4" \
+  --set resources.limits.memory="8Gi" \
+  --set resources.requests.cpu="2" \
+  --set resources.requests.memory="4Gi"
 
+# Provider
 helm upgrade --install akash-provider akash/provider -n akash-services \
              --set attributes[0].key=region --set attributes[0].value=$REGION \
              --set attributes[1].key=chia-plotting --set attributes[1].value=$CHIA_PLOTTING \
@@ -40,11 +50,20 @@ helm upgrade --install akash-provider akash/provider -n akash-services \
              --set keysecret="$(echo $KEY_SECRET | base64)" \
              --set domain=$DOMAIN \
              --set bidpricescript="$(cat bid-engine-script.sh | openssl base64 -A)" \
-             --set node=$NODE
+             --set node=$NODE \
+             --set log_restart_patterns="rpc node is not catching up|bid failed" \
+             --set resources.limits.cpu="2" \
+             --set resources.limits.memory="2Gi" \
+             --set resources.requests.cpu="1" \
+             --set resources.requests.memory="1Gi"
 
+# Provider customizations
+kubectl set env statefulset/akash-provider AKASH_BROADCAST_MODE=block AKASH_TX_BROADCAST_TIMEOUT=15m0s AKASH_BID_TIMEOUT=15m0s AKASH_LEASE_FUNDS_MONITOR_INTERVAL=90s AKASH_WITHDRAWAL_PERIOD=1h -n akash-services
 
+# Hostname Operator
 helm upgrade --install akash-hostname-operator akash/akash-hostname-operator -n akash-services
 
+# Ingress Operator
 ingress_charts(){
 cat > ingress-nginx-custom.yaml << EOF
 controller:
