@@ -4,10 +4,10 @@ cd /home/akash
 
 cleanup_bootstrap() {
     if [ -f ./*bootstrap.sh ]; then
-        echo "Found an old bootstrap - cleaning up"
-        rm ./microk8s-bootstrap.sh
-        rm ./k3s-bootstrap.sh
-        rm ./kubespray-bootstrap.sh
+        echo "Found old installers - cleaning up"
+        rm ./microk8s-bootstrap.sh 2>/dev/null
+        rm ./k3s-bootstrap.sh 2>/dev/null
+        rm ./kubespray-bootstrap.sh 2>/dev/null
     fi
 }
 
