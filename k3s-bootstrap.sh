@@ -1,5 +1,5 @@
 #!/bin/bash
-#To be run on a single microk8s node - to get the base Akash provider software installed.
+#To be run on a single k3s node - to get the base Akash provider software installed.
 
 #Check what user has
 while true
@@ -43,40 +43,15 @@ esac
 done
 
 
-#How many nodes will be in this cluster
-while true
-do
-clear
-read -p "How many nodes will be in this cluster? (1) : " NODES_REQUIRED_
-read -p "Are you sure the cluster size is correct? : $NODES_REQUIRED_ (y/n)? " choice
-case "$choice" in
-  y|Y ) break;;
-  n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with at least 1 or less than 9" ; sleep 3;;
-esac
-done
 
-echo "NODE_1=\4{ens18}@akash" >> variables
 
-if [[ $NODES_REQUIRED_ > 1 ]]; then
-
-for i in $(seq $NODES_REQUIRED_); do
-
-while true
-do
-clear
-count=$i
-if [[ $i == 1 ]]; then count=2 && i=2 && echo "NODE_1=\4{ens18}@akash" >> variables fi 
-read -p "What is the IP of the $i node? (x.x.x.x) : " NODE_$i
-read -p "Are you sure the IP address of the $i node is correct? : $NODE_$1 (y/n)? " choice
-case "$choice" in
-  y|Y ) echo "NODE_$count=NODE_$i" >> variables ; break;;
-  n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with at least 1 or less than 9" ; sleep 3;;
-esac
-done
-done
-fi
+#read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
+#read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
+#read -p "Enter the region for this cluster (us-west/eu-east) : " REGION_
+#read -p "Enter the cpu type for this server (amd/intel) : " CPU_
+#read -p "Enter the download speed of the connection in Mbps (1000) : " DOWNLOAD_
+#read -p "Enter the upload speed of the connection in Mbps (250) : " UPLOAD_
+#read -p "Enter the new keyring password to protect the wallet with (NewWalletPassword): " KEY_SECRET_
 
 #Store securely for user
 KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
@@ -100,25 +75,67 @@ EOF
 systemctl restart systemd-resolved.service
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-apt-get update && apt-get dist-upgrade -yqq ; apt-get install -y cloud-utils open-vm-tools qemu-guest-agent python3-pip git sshpass software-properties-common rsync snapd
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable=traefik" sh -s -
+export DEBIAN_FRONTEND=noninteractive
+apt-get update && apt-get dist-upgrade -yqq
+snap install kubectl --classic ; snap install helm --classic
+
+function k3s(){
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
 mkdir ~/.kube
 cat /etc/rancher/k3s/k3s.yaml | tee ~/.kube/config >/dev/null
-kubectl get nodes
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
+}
+k3s
 
-#snap install helm --classic
+echo "Waiting 30 seconds for k3s to settle..."
+sleep 30
+
+function cilium(){
+CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/master/stable.txt)
+CLI_ARCH=amd64
+if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
+curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
+tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
+rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
+}
+
+echo "Waiting 30 seconds for Cilium to settle..."
+sleep 30
+
+echo "Checking cluster is up..."
+kubectl get pods -A -o wide
+
+#Disable sleep
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+#Disable IPv6
+sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT="maybe-ubiquity"/GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1 maybe-ubiquity"/' /etc/default/grub
+grub-mkconfig -o /boot/grub/grub.cfg
+#Fast reboots
+sed -i -e 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
+systemctl daemon-reload
 }
 depends
 
 function install_akash(){
 #Install Akash and setup wallet
-curl -sSfL https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh
+curl -sSfL https://raw.githubusercontent.com/akash-network/node/master/install.sh | sh
 cp bin/akash /usr/local/bin
 rm -rf bin/
 akash version
 }
 install_akash
 
+function install_akash_provider(){
+curl -sfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | bash
+cp bin/provider-services /usr/local/bin
+rm -rf bin/
+akash version
+}
+install_akash_provider
+
+function setup_wallet(){
 if [[ $NEW_WALLET_ == "true" ]]; then
 apt-get install -y qrencode
 printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default
@@ -137,9 +154,12 @@ echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
 fi
+}
+setup_wallet
 
+function check_wallet(){
 ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
-BALANCE=$(akash query bank balances --node http://rpc.bigtractorplotting.com:26657 $ACCOUNT_ADDRESS_)
+BALANCE=$(akash query bank balances --node https://akash-rpc.global.ssl.fastly.net:443 $ACCOUNT_ADDRESS_)
 MIN_BALANCE=50
 
 if (( $(echo "$BALANCE < 50" | bc -l) )); then
@@ -149,109 +169,20 @@ else
   echo "Found a balance of $BALANCE on the wallet $ACCOUNT_ADDRESS_"
 fi
 sleep 5
+}
+check_wallet
 
-echo "NODES_REQUIRED_=$NODES_REQUIRED_" >> variables
-echo "DOMAIN=$DOMAIN_" >> variables
+echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
 echo "KEY_SECRET=$KEY_SECRET_" >> variables
 echo "REGION=$REGION_" >> variables
 echo "CPU=$CPU_" >> variables
 echo "UPLOAD=$UPLOAD_" >> variables
 echo "DOWNLOAD=$DOWNLOAD_" >> variables
-echo "KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> variables
+echo "KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> variables
 echo "CPU_PRICE=" >> variables
 echo "MEMORY_PRICE=" >> variables
 echo "DISK_PRICE=" >> variables
-
-#echo "Now ready for kubespraying"
-#Building array from nodes defined
-declare -a IPS
-readarray -t IPS <<< $(
-  env | \
-    grep '^NODE_[[:digit:]]\+=' | sort | cut -d= -f2
-)
-
-echo "using pools ${IPS[*]}"
-
-for HOST in "${IPS[@]}"
-do
-COUNTER=$(( COUNTER + 1 ))
-#echo "Split"
-IP=$(echo $HOST | cut -d'@' -f1)
-PASS=$(echo $HOST | cut -d'@' -f2)
-
-if ping -c 1 $IP &> /dev/null
-then
-echo "Found ping to $IP"
-else
-echo "All hosts not ready"
-echo "You must fix this host before the kubespray install can continue."
-echo "Please check the host"
-fi
-
-export SSHPASS=$PASS
-echo $IP >> nodes.log
-function multiple(){
-if ssh -o BatchMode=yes -o ConnectTimeout=2 root@$IP exit
-then
-echo "Found good connection with correct SSH to $IP"
-else
-exit
-ssh-keygen -f "/home/andrew/.ssh/known_hosts" -R "$IP"
-ssh-keyscan $IP >> ~/.ssh/known_hosts
-sshpass -e ssh-copy-id -i ~/.ssh/id_rsa.pub $USER@$IP
-ssh -n $USER@$IP hostnamectl set-hostname node${COUNTER} ; hostname -f
-ssh -n $USER@$IP "echo 127.0.1.1     node${COUNTER} > /etc/hosts ; cat /etc/hosts"
-ssh -n $USER@$IP "sed -i '/ swap / s/^/#/' /etc/fstab"
-#ssh -n $USER@$IP 'echo "br_netfilter" >> /etc/modules'
-ssh -n $USER@$IP reboot
-fi
-}
-
-function ansible(){
-#Setup ansible
-cp -rfp inventory/sample inventory/akash
-#Create config.yaml
-cat nodes.log
-cat nodes.log | sed -e :a -e '$!N; s/\n/ /; ta'
-CONFIG_FILE=inventory/akash/hosts.yaml python3 contrib/inventory_builder/inventory.py $(cat nodes.log | sed -e :a -e '$!N; s/\n/ /; ta')
-cat inventory/akash/hosts.yaml
-#Enable gvisor for security
-ex inventory/akash/hosts.yaml <<eof
-2 insert
-  vars:
-    cluster_id: "1.0.0.1"
-    ansible_user: root
-    gvisor_enabled: true
-.
-xit
-eof
-echo "File Modified"
-cat inventory/akash/hosts.yaml
-}
-ansible
-
-function start_cluster(){
-#Run
-ansible-playbook -i inventory/akash/hosts.yaml -b -v --private-key=~/.ssh/id_rsa cluster.yml
-#Get the kubeconfig from master node
-###########rsync -av root@$(cat nodes.log | head -n1):/root/.kube/config kubeconfig
-#Use the new kubeconfig file for kubectl
-export KUBECONFIG=./kubeconfig
-#Get snap path right
-export PATH=$PATH:/snap/bin
-#Install kubectl and helm using snap
-#snap install kubectl --classic
-#snap install helm --classic
-#Change the name of the server address in kubeconfig to master
-sed -i "s/127.0.0.1/$(cat nodes.log | head -n1)/g" kubeconfig
-cp kubeconfig ../kubeconfig
-}
-start_cluster
-
-export KUBECONFIG=./kubeconfig
-kubectl get nodes -o wide
-
 
 echo "Get latest config from github"
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
@@ -332,3 +263,12 @@ echo "Rebooting in 10 seconds..."
 sleep 10
 reboot now
 
+#Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
+#Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
+
+#Todos:
+# Add checkup after install/first start ( 
+# Add watchdog to check for updates
+# Rename "start-akash" for easy user access
+# Convert to simple menu / GUI for easy of use
+# Support additional methods, k3s/kubespray
