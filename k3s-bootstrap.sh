@@ -97,6 +97,7 @@ tar xzvf cilium-linux-amd64.tar.gz
 chmod +x cilium
 chown akash:akash cilium
 mv cilium /usr/local/bin/
+rm -f cilium-linux-amd64.tar.gz
 helm repo add cilium https://helm.cilium.io/
 helm install cilium cilium/cilium \
     --set global.containerRuntime.integration="containerd" \
