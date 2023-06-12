@@ -96,11 +96,12 @@ tar xzvf cilium-linux-amd64.tar.gz
 chmod +x cilium
 chown akash:akash cilium
 mv cilium /usr/local/bin/
-cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
-echo "Waiting 30 seconds for Cilium to settle..."
-sleep 30
 }
 cilium
+
+cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath='/var/run/k3s/containerd/containerd.sock'
+echo "Waiting 30 seconds for Cilium to settle..."
+sleep 30
 
 echo "Checking cluster is up..."
 kubectl get pods -A -o wide
