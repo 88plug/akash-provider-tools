@@ -1,5 +1,21 @@
 #!/bin/bash
 
+packages=("cloud-guest-utils" "open-vm-tools" "net-tools" "unzip" "snapd" "bmon" "htop" "iotop" "jq" "bc" "git" "curl" "screen")
+
+echo "Checking for latest packages..."
+
+missing_packages=()
+for pkg in "${packages[@]}"; do
+    dpkg -s "$pkg" >/dev/null 2>&1 || missing_packages+=("$pkg")
+done
+
+if [ ${#missing_packages[@]} -eq 0 ]; then
+    echo "All packages are installed and up-to-date."
+else
+    echo "Found missing packages - installing!"
+    apt update && apt install -y "${missing_packages[@]}"
+fi
+
 cd /home/akash
 
 cleanup_bootstrap() {
