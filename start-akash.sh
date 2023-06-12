@@ -1,28 +1,5 @@
 #!/bin/bash
 
-set packages [list "cloud-guest-utils" "open-vm-tools" "net-tools" "unzip" "snapd" "bmon" "htop" "iotop" "jq" "bc" "git" "curl" "screen"]
-
-set missing_packages {}
-
-for {set i 0} {$i < [llength $packages]} {incr i} {
-    set pkg [lindex $packages $i]
-    if {[catch {dpkg -s $pkg}]} {
-        lappend missing_packages $pkg
-    } else {
-        puts "$pkg is already installed."
-    }
-}
-
-if {[llength $missing_packages] == 0} {
-    puts "All packages are already installed."
-} else {
-    set prompt "#|\[\]%|#|:\[\]%|#|$\[\]%|#] "
-    spawn sh -c "sudo apt update && sudo apt install -y {*}$missing_packages"
-    expect -re $prompt
-    send "akash\r"
-    interact
-}
-
 cd /home/akash
 
 cleanup_bootstrap() {
