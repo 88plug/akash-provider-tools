@@ -90,9 +90,12 @@ sleep 30
 k3s
 
 function cilium(){
-rm cilium-linux-amd64.tar.gz >/dev/null
 wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
-chmod +x cilium-linux-amd64.tar.gz ; tar xzvf cilium-linux-amd64.tar.gz ; chmod +x cilium ; mv cilium /usr/local/bin/
+chmod +x cilium-linux-amd64.tar.gz
+tar xzvf cilium-linux-amd64.tar.gz 
+chmod +x cilium
+chown akash:akash cilium
+mv cilium /usr/local/bin/
 cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
 echo "Waiting 30 seconds for Cilium to settle..."
 sleep 30
