@@ -83,6 +83,7 @@ function k3s(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
 mkdir ~/.kube
 cat /etc/rancher/k3s/k3s.yaml | tee ~/.kube/config >/dev/null
+chown akash:akash /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
 echo "Waiting 30 seconds for k3s to settle..."
 sleep 30
@@ -96,10 +97,16 @@ tar xzvf cilium-linux-amd64.tar.gz
 chmod +x cilium
 chown akash:akash cilium
 mv cilium /usr/local/bin/
+helm repo add cilium https://helm.cilium.io/
+helm install cilium cilium/cilium \
+    --set global.containerRuntime.integration="containerd" \
+    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
+    --set global.kubeProxyReplacement="strict" --namespace kube-system
 }
 cilium
 
-cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath='/var/run/k3s/containerd/containerd.sock'
+#cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath='/var/run/k3s/containerd/containerd.sock'
+
 echo "Waiting 30 seconds for Cilium to settle..."
 sleep 30
 
