@@ -1,20 +1,26 @@
 #!/bin/bash
 
-packages=("cloud-guest-utils" "open-vm-tools" "net-tools" "unzip" "snapd" "bmon" "htop" "iotop" "jq" "bc" "git" "curl" "screen")
+set packages [list "cloud-guest-utils" "open-vm-tools" "net-tools" "unzip" "snapd" "bmon" "htop" "iotop" "jq" "bc" "git" "curl" "screen"]
 
-echo "Checking for latest packages..."
+set missing_packages {}
 
-missing_packages=()
-for pkg in "${packages[@]}"; do
-    dpkg -s "$pkg" >/dev/null 2>&1 || missing_packages+=("$pkg")
-done
+foreach pkg $packages {
+    if {[catch {dpkg -s $pkg}]} {
+        lappend missing_packages $pkg
+    } else {
+        puts "$pkg is already installed."
+    }
+}
 
-if [ ${#missing_packages[@]} -eq 0 ]; then
-    echo "All packages are installed and up-to-date."
-else
-    echo "Found missing packages - installing!"
-    apt update && apt install -y "${missing_packages[@]}"
-fi
+if {[llength $missing_packages] == 0} {
+    puts "All packages are already installed."
+} else {
+    set prompt "#|\[\]%|#|:\[\]%|#|$\[\]%|#] "
+    spawn sh -c "sudo apt update && sudo apt install -y {*}$missing_packages"
+    expect -re $prompt
+    send "akash\r"
+    interact
+}
 
 cd /home/akash
 
