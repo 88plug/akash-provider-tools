@@ -4,7 +4,8 @@ set packages [list "cloud-guest-utils" "open-vm-tools" "net-tools" "unzip" "snap
 
 set missing_packages {}
 
-foreach pkg $packages {
+for {set i 0} {$i < [llength $packages]} {incr i} {
+    set pkg [lindex $packages $i]
     if {[catch {dpkg -s $pkg}]} {
         lappend missing_packages $pkg
     } else {
