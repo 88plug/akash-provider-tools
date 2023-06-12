@@ -84,11 +84,11 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disabl
 mkdir ~/.kube
 cat /etc/rancher/k3s/k3s.yaml | tee ~/.kube/config >/dev/null
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
+echo "Waiting 30 seconds for k3s to settle..."
+sleep 30
 }
 k3s
 
-echo "Waiting 30 seconds for k3s to settle..."
-sleep 30
 
 function cilium(){
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/master/stable.txt)
@@ -99,10 +99,10 @@ sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
 tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
-}
-
 echo "Waiting 30 seconds for Cilium to settle..."
 sleep 30
+}
+cilium
 
 echo "Checking cluster is up..."
 kubectl get pods -A -o wide
