@@ -158,11 +158,17 @@ function cilium(){
 #mv cilium /usr/local/bin/
 #rm -f cilium-linux-amd64.tar.gz
 
+# Working
+#helm install cilium cilium/cilium \
+#    --set global.containerRuntime.integration="containerd" \
+#    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
+#    --set global.kubeProxyReplacement="strict" --namespace kube-system
+
 helm repo add cilium https://helm.cilium.io/
 helm install cilium cilium/cilium --version 1.13.3 \
    --namespace kube-system \
    --set operator.replicas=1 \
-   --set bandwidthManager=true
+   --set global.bandwidthManager="true"
 
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
