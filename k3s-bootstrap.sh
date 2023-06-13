@@ -187,6 +187,8 @@ sleep 60
 echo "☸️ Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
 
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
 function cilium(){
 #wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
 #chmod +x cilium-linux-amd64.tar.gz
