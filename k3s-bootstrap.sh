@@ -114,7 +114,9 @@ user_input
 
 
 clear
-echo "Sit back and relax - this could take a few minutes or up to an hour depending on your hardware." 
+echo ""
+echo "Sit back and relax - this could take a few minutes or up to an hour depending on your hardware, connection, and choices." 
+echo ""
 
 #read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 #read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
