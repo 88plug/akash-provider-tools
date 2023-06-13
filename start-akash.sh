@@ -6,6 +6,8 @@ source /home/akash/variables
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+
+
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
 
@@ -71,7 +73,7 @@ EOF
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
-  configure_gpu
+  #configure_gpu
   create_test_pod
 fi
 
