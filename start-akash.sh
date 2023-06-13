@@ -1,8 +1,11 @@
 #!/bin/bash
 
-echo "Welcome back!"
+cd /home/akash
+. variables
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+#!/bin/bash
 
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
@@ -38,7 +41,7 @@ EOF
 }
 
 function create_test_pod() {
-  cat > gpu-test-pod.yaml <<EOF
+  cat > gpu-test-pod.yaml << EOF
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
@@ -64,71 +67,14 @@ spec:
     - name: NVIDIA_VISIBLE_DEVICES
       value: all
     - name: NVIDIA_DRIVER_CAPABILITIES
-      value: all
+      value: all      
 EOF
 
-  k3s kubectl apply -f gpu-test-pod.yaml
+  kubectl apply -f gpu-test-pod.yaml
   echo "Waiting for the test pod to start..."
-
-  wait_for_pod "nbody-gpu-benchmark" 60 5
-}
-
-function wait_for_pod() {
-  local POD_NAME=$1
-  local MAX_WAIT_SECONDS=$2
-  local WAIT_INTERVAL_SECONDS=$3
-  local elapsed_seconds=0
-
-  while [[ $elapsed_seconds -lt $MAX_WAIT_SECONDS ]]; do
-    local pod_status=$(kubectl get pod "$POD_NAME" -o jsonpath='{.status.phase}')
-    
-    case $pod_status in
-      "Pending")
-        echo "Pod '$POD_NAME' is in 'Pending' state. Waiting for it to be scheduled on a node..."
-        ;;
-
-      "Running")
-        local ready_containers=$(kubectl get pod "$POD_NAME" -o jsonpath='{.status.containerStatuses[*].ready}' | grep -c true)
-        local total_containers=$(kubectl get pod "$POD_NAME" -o jsonpath='{.status.containerStatuses[*].ready}' | wc -w)
-        
-        if [[ $ready_containers -eq $total_containers ]]; then
-          echo "All containers in Pod '$POD_NAME' are ready."
-          break
-        else
-          echo "Waiting for all containers in Pod '$POD_NAME' to be ready. Waiting for $WAIT_INTERVAL_SECONDS seconds..."
-        fi
-        ;;
-
-      "Succeeded")
-        echo "Pod '$POD_NAME' has reached the 'Completed' state."
-        kubectl logs "$POD_NAME"
-        kubectl delete pod "$POD_NAME"
-        echo "GPU_BUG=false" >> variables
-
-        break
-        ;;
-
-      "Failed")
-        echo "Pod '$POD_NAME' has reached the 'Failed' state."
-        kubectl logs "$POD_NAME"
-        kubectl delete pod "$POD_NAME"
-        echo "GPU_BUG=true" >> variables
-
-        break
-        ;;
-
-      *)
-        echo "Waiting for Pod '$POD_NAME' to reach the desired state. Waiting for $WAIT_INTERVAL_SECONDS seconds..."
-        ;;
-    }
-
-    sleep "$WAIT_INTERVAL_SECONDS"
-    elapsed_seconds=$((elapsed_seconds + WAIT_INTERVAL_SECONDS))
-  done
-
-  if [[ $elapsed_seconds -ge $MAX_WAIT_SECONDS ]]; then
-    echo "Timeout: Pod '$POD_NAME' did not reach the desired state within $MAX_WAIT_SECONDS seconds."
-  fi
+  sleep 10
+  kubectl logs nbody-gpu-benchmark
+  kubectl delete pod gpu-pod
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
