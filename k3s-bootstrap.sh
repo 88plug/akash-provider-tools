@@ -225,7 +225,7 @@ unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
 fi
 }
-setup_wallet
+setup_wallet &>> /home/akash/logs/installer/wallet.log
 
 function check_wallet(){
 ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
@@ -240,7 +240,7 @@ else
 fi
 sleep 5
 }
-check_wallet
+#check_wallet 
 
 echo "DOMAIN=$DOMAIN_" > variables
 echo "ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS_" >> variables
@@ -254,13 +254,23 @@ echo "CPU_PRICE=" >> variables
 echo "MEMORY_PRICE=" >> variables
 echo "DISK_PRICE=" >> variables
 
-echo "Get latest config from github"
+function provider_install(){
+echo "Installing Akash provider and bid-engine"
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-engine-script.sh
 chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
 chown akash:akash *.sh
+./run-helm-microk8s.sh 
+}
+provider_install &>> /home/akash/logs/installer/provider.log
 
-./run-helm-microk8s.sh &>> /home/akash/logs/installer/provider.log
+cat <<EOF > ./firewall-ports.txt
+8443/tcp - for manifest uploads
+80/tcp - for web app deployments
+443/tcp - for web app deployments
+30000-32767/tcp - for Kubernetes node port range for deployments
+30000-32767/udp - for Kubernetes node port range for deployments
+EOF
 
 rm -f microk8s-bootstrap.sh
 chown akash:akash *.sh
@@ -269,16 +279,9 @@ chown akash:akash variables
 
 #echo "WALLET_FUNDED=0" >> variables
 
-echo "Firewall Setup Required" 
-echo "Please forward these ports to the IP of this machine"
-cat <<EOF > ./firewall-ports.txt
-8443/tcp - for manifest uploads
-80/tcp - for web app deployments
-443/tcp - for web app deployments
-30000-32767/tcp - for Kubernetes node port range for deployments
-30000-32767/udp - for Kubernetes node port range for deployments
-EOF
-cat ./firewall-ports.txt
+#echo "Firewall Setup Required" 
+#echo "Please forward these ports to the IP of this machine"
+#cat ./firewall-ports.txt
 
 
 
