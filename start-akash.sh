@@ -3,30 +3,39 @@
 cd /home/akash
 . variables
 
+export KUBECONFIG=$KUBECONFIG
+
 if lspci | grep -q NVIDIA && [[ -z ${GPU_ENABLED+x} ]]; then
-function gpu(){
-helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
-helm repo add akash https://akash-network.github.io/helm-charts
-helm repo update
-cat > /home/akash/gpu-nvidia-runtime-class.yaml << EOF
+  function install_gpu() {
+    # Add Helm repositories
+    helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+    helm repo add akash https://akash-network.github.io/helm-charts
+    helm repo update
+
+    # Create NVIDIA RuntimeClass
+    cat > /home/akash/gpu-nvidia-runtime-class.yaml <<EOF
 kind: RuntimeClass
 apiVersion: node.k8s.io/v1
 metadata:
   name: nvidia
 handler: nvidia
 EOF
-kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
-helm upgrade -i nvdp nvdp/nvidia-device-plugin \
-  --namespace nvidia-device-plugin \
-  --create-namespace \
-  --version 0.13.0 \
-  --set runtimeClassName="nvidia"
+    kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
 
-echo "Waiting 30 seconds for GPU to settle..."
-sleep 30
-echo "GPU_ENABLED=true" >> variables
-}
-gpu
+    # Install NVIDIA Device Plugin
+    helm upgrade -i nvdp nvdp/nvidia-device-plugin \
+      --namespace nvidia-device-plugin \
+      --create-namespace \
+      --version 0.13.0 \
+      --set runtimeClassName="nvidia"
+
+    echo "Waiting 30 seconds for GPU to settle..."
+    sleep 30
+
+    # Set GPU_ENABLED to true
+    echo "GPU_ENABLED=true" >> variables
+  }
+install_gpu
 fi
 
 
