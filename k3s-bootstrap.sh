@@ -56,28 +56,27 @@ done
 #Store securely for user
 KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
-#Depends / Microk8s / Kubectl / Helm
-function depends(){
-#Secure DNS with DOT
-cat <<EOF > /etc/systemd/resolved.conf
-[Resolve]
-DNS=1.1.1.1 1.0.0.1
-FallbackDNS=8.8.8.10 8.8.8.8
-#Domains=
-#LLMNR=no
-#MulticastDNS=no
-DNSSEC=yes
-DNSOverTLS=yes
-#Cache=yes
-DNSStubListener=yes
-#ReadEtcHosts=yes
-EOF
-systemctl restart systemd-resolved.service
-ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get dist-upgrade -yqq
 snap install kubectl --classic ; snap install helm --classic
+
+function gpu(){
+if lspci | grep -q NVIDIA; then
+echo "Install NVIDIA"
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | apt-key add -
+curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | tee /etc/apt/sources.list.d/libnvidia-container.list
+apt-get update
+ubuntu-drivers install --gpgpu
+DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
+# DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-525
+grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+else
+echo "No GPU Detected"
+fi
+}
+gpu
 
 function k3s(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
@@ -101,13 +100,20 @@ mv cilium /usr/local/bin/
 rm -f cilium-linux-amd64.tar.gz
 helm repo add cilium https://helm.cilium.io/
 helm install cilium cilium/cilium \
+    --set bandwidthManager=true \
     --set global.containerRuntime.integration="containerd" \
-    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
-    --set global.kubeProxyReplacement="strict" --namespace kube-system
+    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
+
+# Not needed
+#--set global.kubeProxyReplacement="strict" --namespace kube-system
+
 }
 cilium
 
-#cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath='/var/run/k3s/containerd/containerd.sock'
+#k3sup install --ip $SERVER_IP --user $USER --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
+#sleep 10
+#cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
+
 
 echo "Waiting 30 seconds for Cilium to settle..."
 sleep 30
