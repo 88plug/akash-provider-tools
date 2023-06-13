@@ -229,11 +229,11 @@ rm -rf bin/
 curl -sfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | bash
 cp bin/provider-services /usr/local/bin
 rm -rf bin/
+echo "Akash Node     : $(akash version)"
+echo "Akash Provider : $(provider-services version)"
 }
 echo "🚀 Installing Akash"
 install_akash &>> /home/akash/logs/installer/akash.log
-echo "Akash Node : $(akash version)"
-echo "Akash Provider Services : $(provider-services version)"
 
 
 function setup_wallet(){
