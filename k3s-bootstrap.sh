@@ -177,6 +177,7 @@ cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/config
 cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/kubeconfig
 chown akash:akash /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/akash/.bashrc
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
 source /home/akash/.bashrc
 # Breaking if we do not wait!
 echo "Waiting 60 seconds for k3s to settle..."
