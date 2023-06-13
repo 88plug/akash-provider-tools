@@ -62,6 +62,9 @@ kubectl set env statefulset/akash-provider AKASH_BROADCAST_MODE=block AKASH_TX_B
 # Hostname Operator
 helm upgrade --install akash-hostname-operator akash/akash-hostname-operator -n akash-services
 
+# Inventory Operator
+helm upgrade --install inventory-operator akash/akash-inventory-operator -n akash-services
+
 # Ingress Operator
 ingress_charts(){
 cat > ingress-nginx-custom.yaml << EOF
@@ -95,7 +98,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-  --version 4.6.0 \
+  --version 4.7.0 \
   --namespace ingress-nginx --create-namespace \
   -f ingress-nginx-custom.yaml
   
