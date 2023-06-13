@@ -147,26 +147,6 @@ depends &>> /home/akash/logs/installer/depends.log
 
 
 
-function gpu() {
-    if lspci | grep -q NVIDIA; then
-        distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-        curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | apt-key add - 
-        curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | tee /etc/apt/sources.list.d/libnvidia-container.list
-        apt-get update
-        ubuntu-drivers autoinstall
-        DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
-        DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
-    else
-        echo "No GPU Detected"
-    fi
-} 
-
-if [[ $GPU_ == "true" ]]; then
-echo "☸️ Installing GPU"
-gpu &>> /home/akash/logs/installer/gpu.log
-else
-echo "☸️ Skipping GPU"
-fi
 
 function k3s(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
@@ -218,6 +198,31 @@ sleep 15
 echo "🕸️ Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
 
+echo "Checking cluster is up..."
+kubectl get pods -A -o wide
+
+function gpu() {
+    if lspci | grep -q NVIDIA; then
+        distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+        curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | apt-key add - 
+        curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | tee /etc/apt/sources.list.d/libnvidia-container.list
+        apt-get update
+        ubuntu-drivers autoinstall
+        DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
+        DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
+    else
+        echo "No GPU Detected"
+    fi
+} 
+
+if [[ $GPU_ == "true" ]]; then
+echo "☸️ Installing GPU"
+gpu &>> /home/akash/logs/installer/gpu.log
+else
+echo "☸️ Skipping GPU"
+fi
+
+
 
 #k3sup install --ip $SERVER_IP --user $USER --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
 #sleep 10
@@ -225,8 +230,6 @@ cilium &>> /home/akash/logs/installer/cilium.log
 
 
 
-echo "Checking cluster is up..."
-kubectl get pods -A -o wide
 
 
 function install_akash(){
