@@ -91,7 +91,7 @@ function wait_for_pod() {
 
   while [[ $elapsed_seconds -lt $MAX_WAIT_SECONDS ]]; do
     local pod_status=$(kubectl get pod "$POD_NAME" -o jsonpath='{.status.phase}')
-    if [[ $pod_status == "Running" ]]; then
+    if [[ $pod_status == "Completed" ]]; then
       local ready_status=$(kubectl get pod "$POD_NAME" -o jsonpath='{.status.containerStatuses[0].ready}')
       if [[ $ready_status == "true" ]]; then
         echo "Pod '$POD_NAME' is ready."
