@@ -41,7 +41,7 @@ EOF
 }
 
 function create_test_pod() {
-  cat > gpu-test-pod.yaml << EOF
+  cat > gpu-test-pod.yaml <<EOF
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
@@ -67,20 +67,47 @@ spec:
     - name: NVIDIA_VISIBLE_DEVICES
       value: all
     - name: NVIDIA_DRIVER_CAPABILITIES
-      value: all      
+      value: all
 EOF
 
   kubectl apply -f gpu-test-pod.yaml
   echo "Waiting for the test pod to start..."
-  sleep 10
-  kubectl logs nbody-gpu-benchmark
-  kubectl delete pod gpu-pod
+
+  wait_for_pod "nbody-gpu-benchmark" 60 5
+
+  # If wait_for_pod completes without timing out, mark GPU_BUG as false
+  if [[ $elapsed_seconds -lt $MAX_WAIT_SECONDS ]]; then
+    echo "GPU_BUG=false" >> variables
+  else
+    echo "GPU_BUG=true" >> variables
+  fi
+}
+
+function wait_for_pod() {
+  local POD_NAME=$1
+  local MAX_WAIT_SECONDS=$2
+  local WAIT_INTERVAL_SECONDS=$3
+  local elapsed_seconds=0
+
+  while [[ $elapsed_seconds -lt $MAX_WAIT_SECONDS ]]; do
+    if kubectl get pod "$POD_NAME" >/dev/null 2>&1; then
+      echo "Pod '$POD_NAME' found."
+      kubectl logs "$POD_NAME"
+      kubectl delete pod "$POD_NAME"
+      break
+    else
+      echo "Pod '$POD_NAME' not found. Waiting for $WAIT_INTERVAL_SECONDS seconds..."
+      sleep "$WAIT_INTERVAL_SECONDS"
+      elapsed_seconds=$((elapsed_seconds + WAIT_INTERVAL_SECONDS))
+    fi
+  done
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
   configure_gpu
   create_test_pod
 fi
+
 
 cleanup_bootstrap() {
     if [ -f ./*bootstrap.sh ]; then
