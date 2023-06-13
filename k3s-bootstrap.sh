@@ -142,7 +142,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sed -i -e 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
 systemctl daemon-reload
 }
-echo "☸️ Updating Ubuntu"
+echo "☸️ [1/7] Updating Ubuntu"
 depends &>> /home/akash/logs/installer/depends.log
 
 function gpu(){
@@ -155,14 +155,50 @@ apt-get update
 ubuntu-drivers autoinstall
 DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-common
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+
+
+function configure_gpu() {
+  echo "Detected GPU but not set up. Starting configuration..."
+
+  # Add Helm repositories
+  helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+  helm repo update
+
+  # Create NVIDIA RuntimeClass
+  cat > /home/akash/gpu-nvidia-runtime-class.yaml <<EOF
+kind: RuntimeClass
+apiVersion: node.k8s.io/v1
+metadata:
+  name: nvidia
+handler: nvidia
+EOF
+
+  kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
+
+  # Install NVIDIA Device Plugin
+  helm upgrade -i nvdp nvdp/nvidia-device-plugin \
+    --namespace nvidia-device-plugin \
+    --create-namespace \
+    --set runtimeClassName="nvidia"
+
+#  echo "Waiting 60 seconds for the GPU to settle..."
+#  sleep 60
+#  kubectl get pods -A -o wide
+
+  # Set GPU_ENABLED to true
+  echo "GPU_ENABLED=true" >> variables
+}
+configure_gpu
+
+
 fi
 }
 
 if [[ $GPU_ == "true" ]]; then
-echo "☸️ Installing GPU : Patience is a virtue."
+echo "☸️ [2/7] Installing GPU : Patience is a virtue."
 gpu &>> /home/akash/logs/installer/gpu.log
 else
-echo "☸️ Skipping GPU"
+echo "☸️ [2/7] Skipping GPU"
 fi
 
 
@@ -183,7 +219,7 @@ echo "Waiting 15 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 15
 } 
-echo "☸️ Installing k3s"
+echo "☸️ [3/7] Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
@@ -215,7 +251,7 @@ helm install cilium cilium/cilium --version 1.13.3 \
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
 }
-echo "🕸️ Installing cilium"
+echo "🕸️ [4/7] Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
 
 echo "Checking cluster is up..."
@@ -241,7 +277,7 @@ rm -rf bin/
 echo "Akash Node     : $(akash version)"
 echo "Akash Provider : $(provider-services version)"
 }
-echo "🚀 Installing Akash"
+echo "🚀 [5/7] Installing Akash"
 install_akash &>> /home/akash/logs/installer/akash.log
 
 
@@ -264,7 +300,7 @@ unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
 fi
 }
-echo "💰 Creating wallet"
+echo "💰 [6/7] Creating wallet"
 setup_wallet &>> /home/akash/logs/installer/wallet.log
 
 function check_wallet(){
@@ -302,10 +338,10 @@ chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
 chown akash:akash *.sh
 ./run-helm-microk8s.sh 
 }
-echo "🌐 Installing Akash Provider and Node"
+echo "🌐 [7/7] Installing Akash Provider and Node"
 provider_install &>> /home/akash/logs/installer/provider.log
 
-echo "🛡️ Creating firewall rules"
+#echo "🛡️ Creating firewall rules"
 cat <<EOF > ./firewall-ports.txt
 8443/tcp - for manifest uploads
 80/tcp - for web app deployments
