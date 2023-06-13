@@ -70,6 +70,7 @@ curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-
 apt-get update
 ubuntu-drivers autoinstall
 DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
+DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 5
 else
