@@ -140,6 +140,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sed -i -e 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
 systemctl daemon-reload
 }
+echo "☸️ Updating Ubuntu"
 depends &>> /home/akash/logs/installer/depends.log
 
 
@@ -159,10 +160,10 @@ function gpu() {
 } 
 
 if [[ $GPU_ == "true" ]]; then
-echo "Installing GPU"
+echo "☸️ Installing GPU"
 gpu &>> /home/akash/logs/installer/gpu.log
 else
-echo "Skipping GPU"
+echo "☸️ Skipping GPU"
 fi
 
 function k3s(){
@@ -175,9 +176,10 @@ cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/kubeconfig
 chown akash:akash /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/akash/.bashrc
 source /home/akash/.bashrc
-echo "Waiting 30 seconds for k3s to settle..."
+# Breaking if we do not wait!
+echo "Waiting 60 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-sleep 30
+sleep 60
 } 
 echo "☸️ Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
@@ -206,7 +208,7 @@ helm install cilium cilium/cilium --version 1.13.3 \
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
 echo "Waiting 15 seconds for Cilium to settle..."
-sleep 30
+sleep 15
 }
 echo "🕸️ Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
