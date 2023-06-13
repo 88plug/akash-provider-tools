@@ -32,8 +32,8 @@ EOF
     --create-namespace \
     --set runtimeClassName="nvidia"
 
-  echo "Waiting 15 seconds for the GPU to settle..."
-  sleep 15
+  echo "Waiting 60 seconds for the GPU to settle..."
+  sleep 60
   kubectl get pods -A -o wide
 
   # Set GPU_ENABLED to true
@@ -64,11 +64,12 @@ spec:
       value: all
 EOF
 
-  kubectl apply -f gpu-test-pod.yaml
+  k3s kubectl apply -f gpu-test-pod.yaml
   echo "Waiting for the test pod to start..."
   sleep 10
-  kubectl logs nbody-gpu-benchmark
-  kubectl delete pod nbody-gpu-benchmark
+  kubectl get pods -A -o wide
+  k3s kubectl logs nbody-gpu-benchmark
+  k3s kubectl delete pod nbody-gpu-benchmark
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
