@@ -29,8 +29,8 @@ EOF
     --create-namespace \
     --set runtimeClassName="nvidia"
 
-  echo "Waiting 30 seconds for the GPU to settle..."
-  sleep 30
+  echo "Waiting 10 seconds for the GPU to settle..."
+  sleep 10
   kubectl get pods -A -o wide
 
   # Set GPU_ENABLED to true
