@@ -197,9 +197,9 @@ cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/kubeconfig
 chown akash:akash /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/akash/.bashrc
 source /home/akash/.bashrc
-echo "Waiting 15 seconds for k3s to settle..."
+echo "Waiting 30 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-sleep 15
+sleep 30
 } 
 echo "☸️ Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
@@ -228,7 +228,7 @@ helm install cilium cilium/cilium --version 1.13.3 \
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
 echo "Waiting 15 seconds for Cilium to settle..."
-sleep 15
+sleep 30
 }
 echo "🕸️ Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
@@ -272,7 +272,6 @@ echo "Your new wallet has been created succesfully!"
 echo "The QR code will be available in : /home/akash/wallet_qr_code.txt.  You can use it to send AKT directly to this wallet."
 echo "Your wallet address is : $ACCOUNT_ADDRESS_"
 echo "Find all your configuration details in /home/akash/variables file."
-sleep 30
 else
 echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
