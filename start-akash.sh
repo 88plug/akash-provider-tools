@@ -1,11 +1,10 @@
 #!/bin/bash
 
 cd /home/akash
-. variables
+if [ -f variables ]; then 
+source /home/akash/variables
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-
-#!/bin/bash
 
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
@@ -76,6 +75,9 @@ if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
   configure_gpu
   create_test_pod
 fi
+
+fi 
+#End NVIDIA
 
 cleanup_bootstrap() {
     if [ -f ./*bootstrap.sh ]; then
