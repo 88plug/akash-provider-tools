@@ -90,17 +90,25 @@ function wait_for_pod() {
   local elapsed_seconds=0
 
   while [[ $elapsed_seconds -lt $MAX_WAIT_SECONDS ]]; do
-    if kubectl get pod "$POD_NAME" >/dev/null 2>&1; then
-      echo "Pod '$POD_NAME' found."
-      kubectl logs "$POD_NAME"
-      kubectl delete pod "$POD_NAME"
-      break
-    else
-      echo "Pod '$POD_NAME' not found. Waiting for $WAIT_INTERVAL_SECONDS seconds..."
-      sleep "$WAIT_INTERVAL_SECONDS"
-      elapsed_seconds=$((elapsed_seconds + WAIT_INTERVAL_SECONDS))
+    local pod_status=$(kubectl get pod "$POD_NAME" -o jsonpath='{.status.phase}')
+    if [[ $pod_status == "Running" ]]; then
+      local ready_status=$(kubectl get pod "$POD_NAME" -o jsonpath='{.status.containerStatuses[0].ready}')
+      if [[ $ready_status == "true" ]]; then
+        echo "Pod '$POD_NAME' is ready."
+        kubectl logs "$POD_NAME"
+        kubectl delete pod "$POD_NAME"
+        break
+      fi
     fi
+
+    echo "Pod '$POD_NAME' not ready. Waiting for $WAIT_INTERVAL_SECONDS seconds..."
+    sleep "$WAIT_INTERVAL_SECONDS"
+    elapsed_seconds=$((elapsed_seconds + WAIT_INTERVAL_SECONDS))
   done
+
+  if [[ $elapsed_seconds -ge $MAX_WAIT_SECONDS ]]; then
+    echo "Timeout: Pod '$POD_NAME' did not become ready within $MAX_WAIT_SECONDS seconds."
+  fi
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
