@@ -127,8 +127,8 @@ function gpu() {
         echo "No GPU Detected"
     fi
 } 
-echo "Installing GPU"
-gpu &>> /home/akash/logs/installer/gpu.log
+#echo "Installing GPU"
+#gpu &>> /home/akash/logs/installer/gpu.log
 
 
 function k3s(){
