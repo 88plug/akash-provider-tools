@@ -2,8 +2,8 @@
 
 cd /home/akash
 
-
-
+if [ -f variables ]; then
+#Only run GPU if variables found, after first setup.
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
 
@@ -94,6 +94,8 @@ if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
 fi
 }
 gpu_start
+fi
+
 
 
 cleanup_bootstrap() {
