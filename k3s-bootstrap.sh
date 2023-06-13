@@ -159,7 +159,7 @@ fi
 }
 
 if [[ $GPU_ == "true" ]]; then
-echo "☸️ Installing GPU"
+echo "☸️ Installing GPU : Patience is a virtue."
 gpu &>> /home/akash/logs/installer/gpu.log
 else
 echo "☸️ Skipping GPU"
