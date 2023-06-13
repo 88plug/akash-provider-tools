@@ -5,17 +5,18 @@ cd /home/akash
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
-  echo "Detected GPU but never setup. Starting to configure..."
+#!/bin/bash
 
-  function install_gpu() {
-    # Add Helm repositories
-    helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
-    helm repo add akash https://akash-network.github.io/helm-charts
-    helm repo update
+function configure_gpu() {
+  echo "Detected GPU but not set up. Starting configuration..."
 
-    # Create NVIDIA RuntimeClass
-    cat > /home/akash/gpu-nvidia-runtime-class.yaml <<EOF
+  # Add Helm repositories
+  helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+  helm repo add akash https://akash-network.github.io/helm-charts
+  helm repo update
+
+  # Create NVIDIA RuntimeClass
+  cat > /home/akash/gpu-nvidia-runtime-class.yaml <<EOF
 kind: RuntimeClass
 apiVersion: node.k8s.io/v1
 metadata:
@@ -23,23 +24,57 @@ metadata:
 handler: nvidia
 EOF
 
-    kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
+  kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
 
-    # Install NVIDIA Device Plugin
-    helm upgrade -i nvdp nvdp/nvidia-device-plugin \
-      --namespace nvidia-device-plugin \
-      --create-namespace \
-      --set runtimeClassName="nvidia"
+  # Install NVIDIA Device Plugin
+  helm upgrade -i nvdp nvdp/nvidia-device-plugin \
+    --namespace nvidia-device-plugin \
+    --create-namespace \
+    --set runtimeClassName="nvidia"
 
-    echo "Waiting 30 seconds for GPU to settle..."
-    sleep 30
-    kubectl get pods -A -o wide
+  echo "Waiting 30 seconds for the GPU to settle..."
+  sleep 30
+  kubectl get pods -A -o wide
 
-    # Set GPU_ENABLED to true
-    echo "GPU_ENABLED=true" >> variables
-  }
+  # Set GPU_ENABLED to true
+  echo "GPU_ENABLED=true" >> variables
+}
 
-  install_gpu
+function create_test_pod() {
+  cat > gpu-test-pod.yaml << EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod
+spec:
+  restartPolicy: Never
+  runtimeClassName: nvidia
+  containers:
+    - name: cuda-container
+      # Nvidia cuda compatibility https://docs.nvidia.com/deploy/cuda-compatibility/
+      # for nvidia 510 drivers
+      ## image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda10.2
+      # for nvidia 525 drivers use below image
+      image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda12.1
+      resources:
+        limits:
+          nvidia.com/gpu: 1 # requesting 1 GPU
+  tolerations:
+  - key: nvidia.com/gpu
+    operator: Exists
+    effect: NoSchedule
+EOF
+
+  kubectl apply -f gpu-test-pod.yaml
+  echo "Waiting for the test pod to start..."
+  sleep 10
+  kubectl logs gpu-pod
+  kubectl delete pod gpu-pod
+}
+
+if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
+  configure_gpu
+  create_test_pod
 fi
 
 cleanup_bootstrap() {
