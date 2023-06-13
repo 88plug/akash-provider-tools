@@ -111,6 +111,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sed -i -e 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
 systemctl daemon-reload
 }
+echo "Installing updates to Ubuntu"
 depends &>> /home/akash/logs/installer/depends.log
 
 
