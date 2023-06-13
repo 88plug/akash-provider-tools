@@ -121,6 +121,7 @@ sleep 30
 echo "Checking cluster is up..."
 kubectl get pods -A -o wide
 
+function depends(){
 #Disable sleep
 systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 #Disable IPv6
