@@ -3,9 +3,11 @@
 cd /home/akash
 . variables
 
-export KUBECONFIG=$KUBECONFIG
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-if lspci | grep -q NVIDIA && [[ -z ${GPU_ENABLED+x} ]]; then
+if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
+  echo "Detected GPU but never setup. Starting to configure..."
+
   function install_gpu() {
     # Add Helm repositories
     helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
@@ -20,24 +22,25 @@ metadata:
   name: nvidia
 handler: nvidia
 EOF
+
     kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
 
     # Install NVIDIA Device Plugin
     helm upgrade -i nvdp nvdp/nvidia-device-plugin \
       --namespace nvidia-device-plugin \
       --create-namespace \
-      --version 0.13.0 \
       --set runtimeClassName="nvidia"
 
     echo "Waiting 30 seconds for GPU to settle..."
     sleep 30
+    kubectl get pods -A -o wide
 
     # Set GPU_ENABLED to true
     echo "GPU_ENABLED=true" >> variables
   }
-install_gpu
-fi
 
+  install_gpu
+fi
 
 cleanup_bootstrap() {
     if [ -f ./*bootstrap.sh ]; then
