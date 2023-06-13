@@ -5,7 +5,6 @@ cd /home/akash
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-#!/bin/bash
 
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
@@ -77,10 +76,13 @@ EOF
   kubectl delete pod gpu-pod
 }
 
+
+function gpu_start(){
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
   configure_gpu
   create_test_pod
 fi
+}
 
 cleanup_bootstrap() {
     if [ -f ./*bootstrap.sh ]; then
