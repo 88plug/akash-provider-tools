@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Welcome back!"
+
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 function configure_gpu() {
