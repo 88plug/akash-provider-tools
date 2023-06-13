@@ -87,6 +87,8 @@ EOF
 
 fi
 
+clear
+
 #read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 #read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
 #read -p "Enter the region for this cluster (us-west/eu-east) : " REGION_
