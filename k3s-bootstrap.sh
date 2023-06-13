@@ -3,6 +3,7 @@
 mkdir -p  /home/akash/logs/installer
 echo "Install logs are available in /home/akash/logs/installer if anything breaks"
 
+function user_input(){
 #Check what user has
 while true
 do
@@ -70,6 +71,7 @@ echo "Dynamic IP Detected"
       * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
     esac
     done
+clear
 echo "📝 Creating DNS Records"
 cat <<EOF > ./dns-records.txt
 *.ingress 300 IN CNAME nodes.$DOMAIN_.
@@ -78,6 +80,7 @@ provider 300 IN CNAME nodes.$DOMAIN_.
 rpc 300 IN CNAME nodes.$DOMAIN_.
 EOF
 else
+clear
 echo "📝 Creating DNS Records"
 cat <<EOF > ./dns-records.txt
 *.ingress 300 IN CNAME nodes.$DOMAIN_.
@@ -89,6 +92,11 @@ rpc 300 IN CNAME nodes.$DOMAIN_.
 EOF
 
 fi
+}
+echo "Just a few questions..."
+# Never log
+user_input 
+
 
 clear
 
