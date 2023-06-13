@@ -25,7 +25,6 @@ function run_with_loader() {
   done
   echo -e "\r\033[1mDone running '$function_to_run'\033[0m\n"
 }
-
 function user_input(){
 #Check what user has
 while true
@@ -137,6 +136,7 @@ user_input
 
 
 clear
+echo "Sit back and relax - this could take a few minutes or up to an hour depending on your hardware." 
 
 #read -p "Enter domain name to use for your provider (example.com) : " DOMAIN_
 #read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...): " mnemonic_
