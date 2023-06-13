@@ -155,7 +155,7 @@ function gpu() {
         apt-get update
         ubuntu-drivers autoinstall
         DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
-        # DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
+        DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
     else
         echo "No GPU Detected"
     fi
