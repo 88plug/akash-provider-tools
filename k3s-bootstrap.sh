@@ -1,6 +1,7 @@
 #!/bin/bash
 #To be run on a single k3s node - to get the base Akash provider software installed.
 mkdir -p  /home/akash/logs/installer
+echo "Install logs are available in /home/akash/logs/installer if anything breaks"
 
 #Check what user has
 while true
@@ -188,17 +189,15 @@ function install_akash(){
 curl -sSfL https://raw.githubusercontent.com/akash-network/node/master/install.sh | sh
 cp bin/akash /usr/local/bin
 rm -rf bin/
-akash version
-}
-install_akash
-
-function install_akash_provider(){
 curl -sfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | bash
 cp bin/provider-services /usr/local/bin
 rm -rf bin/
-akash version
 }
-install_akash_provider
+echo "Installing Akash"
+install_akash &>> /home/akash/logs/installer/akash.log
+echo "Akash Node : $(akash version)"
+echo "Akash Provider Services : $(provider-services version)"
+
 
 function setup_wallet(){
 if [[ $NEW_WALLET_ == "true" ]]; then
@@ -255,7 +254,7 @@ wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-e
 chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
 chown akash:akash *.sh
 
-./run-helm-microk8s.sh
+./run-helm-microk8s.sh &>> /home/akash/logs/installer/provider.log
 
 rm -f microk8s-bootstrap.sh
 chown akash:akash *.sh
@@ -283,9 +282,8 @@ echo "SETUP_COMPLETE=true" >> variables
 
 
 echo "Setup Complete"
-echo "Rebooting in 10 seconds..."
-sleep 10
-reboot now
+echo "Rebooting ..."
+reboot now --force
 
 #Add/scale the cluster with 'microk8s add-node' and use the token on additional nodes.
 #Use 'microk8s enable dns:1.1.1.1' after you add more than 1 node.
