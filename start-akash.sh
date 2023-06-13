@@ -44,24 +44,23 @@ function create_test_pod() {
 apiVersion: v1
 kind: Pod
 metadata:
-  name: gpu-pod
+  name: nbody-gpu-benchmark
+  namespace: default
 spec:
-  restartPolicy: Never
+  restartPolicy: OnFailure
   runtimeClassName: nvidia
   containers:
-    - name: cuda-container
-      # Nvidia cuda compatibility https://docs.nvidia.com/deploy/cuda-compatibility/
-      # for nvidia 510 drivers
-      ## image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda10.2
-      # for nvidia 525 drivers use below image
-      image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda12.1
-      resources:
-        limits:
-          nvidia.com/gpu: 1 # requesting 1 GPU
-  tolerations:
-  - key: nvidia.com/gpu
-    operator: Exists
-    effect: NoSchedule
+  - name: cuda-container
+    image: nvcr.io/nvidia/k8s/cuda-sample:nbody
+    args: ["nbody", "-gpu", "-benchmark"]
+    resources:
+      limits:
+        nvidia.com/gpu: 1
+    env:
+    - name: NVIDIA_VISIBLE_DEVICES
+      value: all
+    - name: NVIDIA_DRIVER_CAPABILITIES
+      value: all
 EOF
 
   kubectl apply -f gpu-test-pod.yaml
