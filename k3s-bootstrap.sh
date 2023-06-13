@@ -137,7 +137,7 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disabl
 mkdir ~/.kube
 cat /etc/rancher/k3s/k3s.yaml | tee ~/.kube/config >/dev/null
 chown akash:akash /etc/rancher/k3s/k3s.yaml
-chmod 644 /etc/rancher/k3s/k3s.yaml
+chmod 600 /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
 echo "Waiting 30 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
