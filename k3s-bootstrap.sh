@@ -70,6 +70,7 @@ echo "Dynamic IP Detected"
       * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
     esac
     done
+echo "📝 Creating DNS Records"
 cat <<EOF > ./dns-records.txt
 *.ingress 300 IN CNAME nodes.$DOMAIN_.
 nodes 300 IN CNAME $DYNAMICIP_.
@@ -77,6 +78,7 @@ provider 300 IN CNAME nodes.$DOMAIN_.
 rpc 300 IN CNAME nodes.$DOMAIN_.
 EOF
 else
+echo "📝 Creating DNS Records"
 cat <<EOF > ./dns-records.txt
 *.ingress 300 IN CNAME nodes.$DOMAIN_.
 nodes 300 IN A X.X.X.X. #IP of this machine and any additional nodes
@@ -114,7 +116,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sed -i -e 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
 systemctl daemon-reload
 }
-echo "Installing updates to Ubuntu"
+echo "🧰 Installing updates to Ubuntu"
 depends &>> /home/akash/logs/installer/depends.log
 
 
@@ -146,7 +148,7 @@ echo "Waiting 30 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 30
 } 
-echo "Installing k3s"
+echo "☸️ Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
 
 function cilium(){
@@ -174,7 +176,7 @@ helm install cilium cilium/cilium --version 1.13.3 \
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
 
 }
-echo "Installing cilium"
+echo "🕸️ Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
 
 
@@ -199,7 +201,7 @@ curl -sfL https://raw.githubusercontent.com/akash-network/provider/main/install.
 cp bin/provider-services /usr/local/bin
 rm -rf bin/
 }
-echo "Installing Akash"
+echo "🚀 Installing Akash"
 install_akash &>> /home/akash/logs/installer/akash.log
 echo "Akash Node : $(akash version)"
 echo "Akash Provider Services : $(provider-services version)"
@@ -225,6 +227,7 @@ unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
 fi
 }
+echo "💰 Creating wallet"
 setup_wallet &>> /home/akash/logs/installer/wallet.log
 
 function check_wallet(){
@@ -262,8 +265,10 @@ chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
 chown akash:akash *.sh
 ./run-helm-microk8s.sh 
 }
+echo "🌐 Installing Akash Provider and Node"
 provider_install &>> /home/akash/logs/installer/provider.log
 
+echo "🛡️ Creating firewall rules"
 cat <<EOF > ./firewall-ports.txt
 8443/tcp - for manifest uploads
 80/tcp - for web app deployments
