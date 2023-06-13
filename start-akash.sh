@@ -72,10 +72,10 @@ spec:
 EOF
 
   kubectl apply -f gpu-test-pod.yaml
-  echo "Waiting 30 seconds for the test pod to start..."
-  sleep 30
+  echo "Waiting 10 seconds for the test pod to start..."
+  sleep 10
   kubectl logs nbody-gpu-benchmark
-  kubectl delete pod nbody-gpu-benchmark
+  kubectl get pods -A -o wide
 }
 
 
@@ -93,6 +93,8 @@ if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
   create_test_pod
 fi
 }
+gpu_start
+
 
 cleanup_bootstrap() {
     if [ -f ./*bootstrap.sh ]; then
