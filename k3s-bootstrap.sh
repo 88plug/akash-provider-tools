@@ -160,9 +160,9 @@ echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/akash/.bashrc
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
 source /home/akash/.bashrc
 # Breaking if we do not wait!
-echo "Waiting 60 seconds for k3s to settle..."
+echo "Waiting 15 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-sleep 60
+sleep 15
 } 
 echo "☸️ Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
@@ -192,8 +192,6 @@ helm install cilium cilium/cilium --version 1.13.3 \
 
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
-echo "Waiting 15 seconds for Cilium to settle..."
-sleep 15
 }
 echo "🕸️ Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
@@ -209,7 +207,7 @@ function gpu() {
         apt-get update
         ubuntu-drivers autoinstall
         DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
-        DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
+        # DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
     else
         echo "No GPU Detected"
     fi
