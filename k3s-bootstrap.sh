@@ -3,28 +3,6 @@
 mkdir -p  /home/akash/logs/installer
 echo "Install logs are available in /home/akash/logs/installer if anything breaks"
 
-function run_with_loader() {
-  function_to_run=$1
-  log_file=$2
-
-  $function_to_run &>> $log_file &
-  pid=$!
-
-  spinner='/-\|'
-  while :
-  do
-    for i in $(seq 0 3)
-    do
-      echo -en "\r\033[1;33m${spinner:$i:1}\033[0m"
-      if [ -n "$(ps -p $pid | tail -n +2)" ]; then
-        sleep 0.1
-      else
-        break 2
-      fi
-    done
-  done
-  echo -e "\r\033[1mDone running '$function_to_run'\033[0m\n"
-}
 function user_input(){
 #Check what user has
 while true
@@ -162,7 +140,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sed -i -e 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
 systemctl daemon-reload
 }
-run_with_loader "depends" "/home/akash/logs/installer/depends.log"
+depends &>> /home/akash/logs/installer/depends.log
 
 
 
