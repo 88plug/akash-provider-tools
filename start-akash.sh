@@ -6,8 +6,6 @@ source /home/akash/variables
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-
-
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
 
@@ -65,16 +63,16 @@ spec:
 EOF
 
   k3s kubectl apply -f gpu-test-pod.yaml
-  echo "Waiting for the test pod to start..."
-  sleep 10
-  kubectl get pods -A -o wide
+  echo "Waiting 60 seconds for the test pod to start..."
+  sleep 60
+  k3s kubectl get pods -A -o wide
   k3s kubectl logs nbody-gpu-benchmark
   k3s kubectl delete pod nbody-gpu-benchmark
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
   configure_gpu
-  #create_test_pod
+  create_test_pod
 fi
 
 fi 
