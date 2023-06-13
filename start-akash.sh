@@ -75,12 +75,6 @@ EOF
 
   wait_for_pod "nbody-gpu-benchmark" 60 5
 
-  # If wait_for_pod completes without timing out, mark GPU_BUG as false
-  if [[ $elapsed_seconds -lt $MAX_WAIT_SECONDS ]]; then
-    echo "GPU_BUG=false" >> variables
-  else
-  fi
-
 function wait_for_pod() {
   local POD_NAME=$1
   local MAX_WAIT_SECONDS=$2
