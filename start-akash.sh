@@ -13,7 +13,6 @@ function configure_gpu() {
 
   # Add Helm repositories
   helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
-  helm repo add akash https://akash-network.github.io/helm-charts
   helm repo update
 
   # Create NVIDIA RuntimeClass
@@ -33,8 +32,8 @@ EOF
     --create-namespace \
     --set runtimeClassName="nvidia"
 
-  echo "Waiting 30 seconds for the GPU to settle..."
-  sleep 30
+  echo "Waiting 15 seconds for the GPU to settle..."
+  sleep 15
   kubectl get pods -A -o wide
 
   # Set GPU_ENABLED to true
@@ -73,7 +72,7 @@ EOF
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
-  #configure_gpu
+  configure_gpu
   create_test_pod
 fi
 
