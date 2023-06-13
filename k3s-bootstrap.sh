@@ -155,42 +155,6 @@ apt-get update
 ubuntu-drivers autoinstall
 DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-common
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-
-
-function configure_gpu() {
-  echo "Detected GPU but not set up. Starting configuration..."
-
-  # Add Helm repositories
-  helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
-  helm repo update
-
-  # Create NVIDIA RuntimeClass
-  cat > /home/akash/gpu-nvidia-runtime-class.yaml <<EOF
-kind: RuntimeClass
-apiVersion: node.k8s.io/v1
-metadata:
-  name: nvidia
-handler: nvidia
-EOF
-
-  kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
-
-  # Install NVIDIA Device Plugin
-  helm upgrade -i nvdp nvdp/nvidia-device-plugin \
-    --namespace nvidia-device-plugin \
-    --create-namespace \
-    --set runtimeClassName="nvidia"
-
-#  echo "Waiting 60 seconds for the GPU to settle..."
-#  sleep 60
-#  kubectl get pods -A -o wide
-
-  # Set GPU_ENABLED to true
-  echo "GPU_ENABLED=true" >> variables
-}
-configure_gpu
-
-
 fi
 }
 
@@ -254,8 +218,46 @@ helm install cilium cilium/cilium --version 1.13.3 \
 echo "🕸️ [4/7] Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
 
+
 echo "Checking cluster is up..."
 kubectl get pods -A -o wide
+
+function configure_gpu() {
+  echo "Detected GPU but not set up. Starting configuration..."
+
+  # Add Helm repositories
+  helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+  helm repo update
+
+  # Create NVIDIA RuntimeClass
+  cat > /home/akash/gpu-nvidia-runtime-class.yaml <<EOF
+kind: RuntimeClass
+apiVersion: node.k8s.io/v1
+metadata:
+  name: nvidia
+handler: nvidia
+EOF
+
+  kubectl apply -f /home/akash/gpu-nvidia-runtime-class.yaml
+
+  # Install NVIDIA Device Plugin
+  helm upgrade -i nvdp nvdp/nvidia-device-plugin \
+    --namespace nvidia-device-plugin \
+    --create-namespace \
+    --set runtimeClassName="nvidia"
+
+#  echo "Waiting 60 seconds for the GPU to settle..."
+#  sleep 60
+#  kubectl get pods -A -o wide
+
+  # Set GPU_ENABLED to true
+  echo "GPU_ENABLED=true" >> variables
+}
+echo "🕸️ [5/7] Configure GPU for k3s"
+configure_gpu &>> /home/akash/logs/installer/configure_gpu.log
+
+
+
 
 
 #k3sup install --ip $SERVER_IP --user $USER --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
