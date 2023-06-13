@@ -3,7 +3,7 @@
 cd /home/akash
 . variables
 
-if lspci | grep -q NVIDIA && $GPU_ENABLED != "true"; then
+if lspci | grep -q NVIDIA && [[ -z ${GPU_ENABLED+x} ]]; then
 function gpu(){
 helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
 helm repo add akash https://akash-network.github.io/helm-charts
