@@ -66,8 +66,8 @@ EOF
   kubectl apply -f gpu-test-pod.yaml
   echo "Waiting for the test pod to start..."
   sleep 10
-  kubectl logs gpu-pod
-  kubectl delete pod gpu-pod
+  kubectl logs nbody-gpu-benchmark
+  kubectl delete pod nbody-gpu-benchmark
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
