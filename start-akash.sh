@@ -74,7 +74,7 @@ EOF
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
   configure_gpu
-  create_test_pod
+  #create_test_pod
 fi
 
 fi 
