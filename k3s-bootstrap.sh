@@ -32,6 +32,21 @@ esac
 done
 fi
 
+#GPU Support#
+if lspci | grep -q NVIDIA; then
+while true
+do
+clear
+read -p "NVIDIA GPU Detected : Would you like to enable it on this host? (y/n)? : " GPU_
+read -p "Are you sure you want to enable GPU support? : $GPU_ (y/n)? " choice
+case "$choice" in
+  y|Y ) GPU_=false ; break;;
+  n|N ) echo "Enabling GPU support" ; GPU_=true ; sleep 3;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
+esac
+done
+fi
+
 #Domain is required
 while true
 do
@@ -136,14 +151,18 @@ function gpu() {
         apt-get update
         ubuntu-drivers autoinstall
         DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
-        DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
+        # DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
     else
         echo "No GPU Detected"
     fi
 } 
-#echo "Installing GPU"
-#gpu &>> /home/akash/logs/installer/gpu.log
 
+if [[ $GPU_ == "true" ]]; then
+echo "Installing GPU"
+gpu &>> /home/akash/logs/installer/gpu.log
+else
+echo "Skipping GPU"
+fi
 
 function k3s(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
@@ -155,9 +174,9 @@ cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/kubeconfig
 chown akash:akash /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/akash/.bashrc
 source /home/akash/.bashrc
-echo "Waiting 30 seconds for k3s to settle..."
+echo "Waiting 15 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-sleep 30
+sleep 15
 } 
 echo "☸️ Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
@@ -185,7 +204,8 @@ helm install cilium cilium/cilium --version 1.13.3 \
 
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
-
+echo "Waiting 15 seconds for Cilium to settle..."
+sleep 15
 }
 echo "🕸️ Installing cilium"
 cilium &>> /home/akash/logs/installer/cilium.log
@@ -196,8 +216,6 @@ cilium &>> /home/akash/logs/installer/cilium.log
 #cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
 
 
-echo "Waiting 30 seconds for Cilium to settle..."
-sleep 30
 
 echo "Checking cluster is up..."
 kubectl get pods -A -o wide
