@@ -40,8 +40,8 @@ clear
 read -p "NVIDIA GPU Detected : Would you like to enable it on this host? (y/n)? : " GPU_
 read -p "Are you sure you want to enable GPU support? : $GPU_ (y/n)? " choice
 case "$choice" in
-  y|Y ) GPU_=false ; break;;
-  n|N ) echo "Enabling GPU support" ; GPU_=true ; sleep 3;;
+  y|Y ) GPU_=true ; break;;
+  n|N ) echo "Skipping GPU support" ; GPU_=false ; sleep 3;;
   * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
 esac
 done
