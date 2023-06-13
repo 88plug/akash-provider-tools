@@ -1,11 +1,6 @@
 #!/bin/bash
 
-cd /home/akash
-. variables
-
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-
-#!/bin/bash
 
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
@@ -74,6 +69,7 @@ EOF
   echo "Waiting for the test pod to start..."
 
   wait_for_pod "nbody-gpu-benchmark" 60 5
+}
 
 function wait_for_pod() {
   local POD_NAME=$1
@@ -132,14 +128,11 @@ function wait_for_pod() {
     echo "Timeout: Pod '$POD_NAME' did not reach the desired state within $MAX_WAIT_SECONDS seconds."
   fi
 }
-}
-
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
   configure_gpu
   create_test_pod
 fi
-
 
 cleanup_bootstrap() {
     if [ -f ./*bootstrap.sh ]; then
