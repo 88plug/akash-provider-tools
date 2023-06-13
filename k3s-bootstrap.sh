@@ -70,8 +70,7 @@ curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-
 apt-get update
 ubuntu-drivers autoinstall
 DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
-DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515
-grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
 sleep 5
 else
 echo "No GPU Detected"
@@ -87,23 +86,25 @@ chown akash:akash /etc/rancher/k3s/k3s.yaml
 chmod 644 /etc/rancher/k3s/k3s.yaml
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
 echo "Waiting 30 seconds for k3s to settle..."
+grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 30
 }
 k3s
 
 function cilium(){
-wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
-chmod +x cilium-linux-amd64.tar.gz
-tar xzvf cilium-linux-amd64.tar.gz 
-chmod +x cilium
-chown akash:akash cilium
-mv cilium /usr/local/bin/
-rm -f cilium-linux-amd64.tar.gz
+#wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
+#chmod +x cilium-linux-amd64.tar.gz
+#tar xzvf cilium-linux-amd64.tar.gz 
+#chmod +x cilium
+#chown akash:akash cilium
+#mv cilium /usr/local/bin/
+#rm -f cilium-linux-amd64.tar.gz
+
 helm repo add cilium https://helm.cilium.io/
-helm install cilium cilium/cilium \
-    --set bandwidthManager=true \
-    --set global.containerRuntime.integration="containerd" \
-    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
+helm install cilium cilium/cilium --version 1.13.3 \
+   --namespace kube-system \
+   --set operator.replicas=1 \
+   --set bandwidthManager=true
 
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
