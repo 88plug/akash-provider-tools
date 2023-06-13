@@ -147,11 +147,14 @@ function gpu() {
 
 function k3s(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
-mkdir ~/.kube
-cat /etc/rancher/k3s/k3s.yaml | tee ~/.kube/config >/dev/null
-chown akash:akash /etc/rancher/k3s/k3s.yaml
 chmod 600 /etc/rancher/k3s/k3s.yaml
-echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
+mkdir -p /home/akash/.kube
+# Not all apps use the new default of "config"
+cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/config
+cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/kubeconfig
+chown akash:akash /etc/rancher/k3s/k3s.yaml
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/akash/.bashrc
+source /home/akash/.bashrc
 echo "Waiting 30 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 30
