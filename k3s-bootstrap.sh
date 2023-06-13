@@ -1,5 +1,6 @@
 #!/bin/bash
 #To be run on a single k3s node - to get the base Akash provider software installed.
+mkdir -p  /home/akash/logs/installer
 
 #Check what user has
 while true
@@ -61,22 +62,22 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get dist-upgrade -yqq
 snap install kubectl --classic ; snap install helm --classic
 
-function gpu(){
-if lspci | grep -q NVIDIA; then
-echo "Install NVIDIA"
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | apt-key add -
-curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | tee /etc/apt/sources.list.d/libnvidia-container.list
-apt-get update
-ubuntu-drivers autoinstall
-DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
-DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
-sleep 5
-else
-echo "No GPU Detected"
-fi
-}
-gpu
+function gpu() {
+    if lspci | grep -q NVIDIA; then
+        distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+        curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | apt-key add - 
+        curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | tee /etc/apt/sources.list.d/libnvidia-container.list
+        apt-get update
+        ubuntu-drivers autoinstall
+        DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime ubuntu-drivers-commons
+        DEBIAN_FRONTEND=noninteractive apt-get install -y cuda-drivers-fabricmanager-515 
+    else
+        echo "No GPU Detected"
+    fi
+} 
+echo "Installing GPU"
+gpu &>> /home/akash/logs/installer/gpu.log
+
 
 function k3s(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
@@ -88,8 +89,9 @@ echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
 echo "Waiting 30 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 30
-}
-k3s
+} 
+echo "Installing k3s"
+k3s &>> /home/akash/logs/installer/k3s.log
 
 function cilium(){
 #wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
@@ -110,7 +112,9 @@ helm install cilium cilium/cilium --version 1.13.3 \
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
 
 }
-cilium
+echo "Installing cilium"
+cilium &>> /home/akash/logs/installer/cilium.log
+
 
 #k3sup install --ip $SERVER_IP --user $USER --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
 #sleep 10
