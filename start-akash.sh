@@ -1,10 +1,14 @@
 #!/bin/bash
 
 cd /home/akash
-. variables
 
+if [ -f variables ]; then
+source variables
+fi
+
+if [ -f /etc/rancher/k3s/k3s.yaml ]; then
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-
+fi
 
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
