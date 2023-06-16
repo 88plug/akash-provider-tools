@@ -140,12 +140,6 @@ main() {
         if [[ $SETUP_COMPLETE == true ]]; then
             export KUBECONFIG=/home/akash/.kube/kubeconfig
             echo "Variables file detected - Setup complete."
-            echo "Updating Dashboard"
-            systemctl stop gunicorn.service
-            rm -rf /home/akash/dashboard
-            git clone https://github.com/cryptoandcoffee/akashos-dashboard /home/akash/dashboard
-            systemctl start gunicorn.service
-            echo "Started the Dashboard after update"
         fi
     fi
 }
