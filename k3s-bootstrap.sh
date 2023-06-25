@@ -186,6 +186,8 @@ sleep 15
 echo "☸️ Installing k3s"
 k3s &>> /home/akash/logs/installer/k3s.log
 
+chown -R akash:akash /home/akash/.kube/
+
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 function cilium(){
