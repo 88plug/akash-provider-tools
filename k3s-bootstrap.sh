@@ -298,11 +298,11 @@ echo "DISK_PRICE=" >> variables
 
 function provider_install(){
 echo "Installing Akash provider and bid-engine"
-wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-microk8s.sh
+wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-k3s.sh
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-engine-script.sh
-chmod +x run-helm-microk8s.sh ; chmod +x bid-engine-script.sh
+chmod +x run-helm-k3s.sh ; chmod +x bid-engine-script.sh
 chown akash:akash *.sh
-./run-helm-microk8s.sh 
+./run-helm-k3s.sh 
 }
 echo "🌐 Installing Akash Provider and Node"
 provider_install &>> /home/akash/logs/installer/provider.log
@@ -316,7 +316,7 @@ cat <<EOF > ./firewall-ports.txt
 30000-32767/udp - for Kubernetes node port range for deployments
 EOF
 
-rm -f microk8s-bootstrap.sh
+rm -f run-helm-k3s.sh
 chown akash:akash *.sh
 chown akash:akash *.txt
 chown akash:akash variables
@@ -326,8 +326,6 @@ chown akash:akash variables
 #echo "Firewall Setup Required" 
 #echo "Please forward these ports to the IP of this machine"
 #cat ./firewall-ports.txt
-
-
 
 echo "SETUP_COMPLETE=true" >> variables
 
