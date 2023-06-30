@@ -251,9 +251,7 @@ function setup_wallet(){
 if [[ $NEW_WALLET_ == "true" ]]; then
 apt-get install -y qrencode
 
-#printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default
-output=$(printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default)
-MNEMONIC=$(echo "$output" | tail -n 1)
+printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default
 
 printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys export default > key.pem
 qrencode -t ASCIIi $(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-) > wallet_qr_code.txt
@@ -266,12 +264,18 @@ echo "Your wallet address is : $ACCOUNT_ADDRESS_"
 echo "Find all your configuration details in /home/akash/variables file."
 else
 echo "$mnemonic_" | akash keys add default --recover
-unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
 fi
 }
 echo "💰 Creating wallet"
 setup_wallet &>> /home/akash/logs/installer/wallet.log
+
+if [[ $NEW_WALLET_ == "true" ]]; then
+MNEMONIC=$(grep -oE '(\b[A-Za-z]+\b\s*){24}' /home/akash/logs/installer/wallet.log)
+else
+MNEMONIC=$mnemonic_
+unset mnemonic_
+fi
 
 function check_wallet(){
 ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
