@@ -117,7 +117,7 @@ main() {
     cleanup_bootstrap
     if [ ! -f variables ]; then
         while true; do
-            read -p "Which Kubernetes install method would you like to use (k3s/microk8s/kubespray)? (microk8s): " method
+            read -p "Which Kubernetes install method would you like to use (k3s/microk8s/kubespray)? (k3s): " method
             read -p "Are you sure you want to install with the $method method? (y/n): " choice
 
             case "$choice" in
@@ -126,7 +126,7 @@ main() {
                     break
                     ;;
                 [Nn])
-                    echo "Please try again with microk8s if unsure"
+                    echo "Please try again with k3s if unsure"
                     sleep 3
                     ;;
                 *)
