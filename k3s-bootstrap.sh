@@ -264,6 +264,9 @@ else
 echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
+echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys mnemonic >  mnemonic.secret
+MNEMONIC=$(cat mnemonic.secret)
+rm mnemonic.secret
 fi
 }
 echo "💰 Creating wallet"
@@ -295,6 +298,7 @@ echo "KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> variables
 echo "CPU_PRICE=" >> variables
 echo "MEMORY_PRICE=" >> variables
 echo "DISK_PRICE=" >> variables
+echo "MNEMONIC=$mnemonic" >> variables
 
 function provider_install(){
 echo "Installing Akash provider and bid-engine"
