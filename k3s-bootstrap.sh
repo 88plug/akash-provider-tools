@@ -325,7 +325,6 @@ cat <<EOF > ./firewall-ports.txt
 30000-32767/udp - for Kubernetes node port range for deployments
 EOF
 
-rm -f run-helm-k3s.sh
 chown akash:akash *.sh
 chown akash:akash *.txt
 chown akash:akash variables
