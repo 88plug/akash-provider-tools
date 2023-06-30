@@ -271,7 +271,7 @@ echo "💰 Creating wallet"
 setup_wallet &>> /home/akash/logs/installer/wallet.log
 
 if [[ $NEW_WALLET_ == "true" ]]; then
-MNEMONIC=$(grep -oE '(\b[A-Za-z]+\b\s*){24}' /home/akash/logs/installer/wallet.log)
+MNEMONIC=$(awk '/forget your password./{getline; getline; print}' /home/akash/logs/installer/wallet.log)
 else
 MNEMONIC=$mnemonic_
 unset mnemonic_
