@@ -249,10 +249,7 @@ install_akash &>> /home/akash/logs/installer/akash.log
 
 function setup_wallet(){
 if [[ $NEW_WALLET_ == "true" ]]; then
-apt-get install -y qrencode
-
 printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default
-
 printf "$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys export default > key.pem
 qrencode -t ASCIIi $(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-) > wallet_qr_code.txt
 clear
@@ -263,8 +260,9 @@ echo "The QR code will be available in : /home/akash/wallet_qr_code.txt.  You ca
 echo "Your wallet address is : $ACCOUNT_ADDRESS_"
 echo "Find all your configuration details in /home/akash/variables file."
 else
-echo "$mnemonic_" | akash keys add default --recover
+printf "$mnemonic_\n$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default --recover
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
+qrencode -t ASCIIi $(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-) > wallet_qr_code.txt
 fi
 }
 echo "💰 Creating wallet"
