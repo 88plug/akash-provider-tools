@@ -260,13 +260,11 @@ echo "Your new wallet has been created succesfully!"
 echo "The QR code will be available in : /home/akash/wallet_qr_code.txt.  You can use it to send AKT directly to this wallet."
 echo "Your wallet address is : $ACCOUNT_ADDRESS_"
 echo "Find all your configuration details in /home/akash/variables file."
+MNEMONIC=$(akash keys mnemonic)
 else
 echo "$mnemonic_" | akash keys add default --recover
 unset mnemonic_
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
-echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys mnemonic >  mnemonic.secret
-MNEMONIC=$(cat mnemonic.secret)
-rm mnemonic.secret
 fi
 }
 echo "💰 Creating wallet"
