@@ -296,7 +296,7 @@ echo "KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> variables
 echo "CPU_PRICE=" >> variables
 echo "MEMORY_PRICE=" >> variables
 echo "DISK_PRICE=" >> variables
-echo "MNEMONIC=$mnemonic" >> variables
+echo "MNEMONIC=$MNEMONIC" >> variables
 
 function provider_install(){
 echo "Installing Akash provider and bid-engine"
