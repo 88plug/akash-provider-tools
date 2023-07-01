@@ -166,7 +166,17 @@ echo "☸️ Skipping GPU"
 fi
 
 function k3sup(){
-curl -sLS https://get.k3sup.dev | sh -s -
+
+# Check if k3sup is already installed
+
+  if ! command -v k3sup &>/dev/null; then
+    # Download and install k3sup
+    curl -sLS https://get.k3sup.dev | sh
+  else
+    echo "k3sup is already installed. Skipping installation."
+  fi
+
+
 k3sup install --local --user root --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
 chmod 600 /etc/rancher/k3s/k3s.yaml
 mkdir -p /home/akash/.kube
