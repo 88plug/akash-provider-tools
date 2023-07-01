@@ -260,9 +260,13 @@ echo "The QR code will be available in : /home/akash/wallet_qr_code.txt.  You ca
 echo "Your wallet address is : $ACCOUNT_ADDRESS_"
 echo "Find all your configuration details in /home/akash/variables file."
 else
-( printf "$mnemonic_\n$KEY_SECRET_\n"; sleep 2; printf "$KEY_SECRET_\n" ) | akash keys add default --recover
+# ( printf "$mnemonic_\n$KEY_SECRET_\n"; sleep 2; printf "$KEY_SECRET_\n" ) | akash keys add default --recover
 # printf "$mnemonic_\n$KEY_SECRET_\n$KEY_SECRET_\n" | akash keys add default --recover
+# use printf to generate the required input for the akash command
+input=$(printf "%s\n%s\n%s\n" "$mnemonic_" "$KEY_SECRET_" "$KEY_SECRET_")
+echo "$input" | akash keys add default --recover
 echo "$KEY_SECRET_ $KEY_SECRET_" | akash keys export default > key.pem
+ACCOUNT_ADDRESS_=$(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-)
 qrencode -t ASCIIi $(echo $KEY_SECRET_ | akash keys list | grep address | cut -d ':' -f2 | cut -c 2-) > wallet_qr_code.txt
 fi
 }
