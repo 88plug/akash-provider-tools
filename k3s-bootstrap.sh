@@ -216,10 +216,8 @@ chmod +x cilium
 chown akash:akash cilium
 mv cilium /usr/local/bin/
 rm -f cilium-linux-amd64.tar.gz
-# cilium install --set bandwidthManager.enabled=true --set global.containerRuntime.integration="containerd" --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
-cilium install --set bandwidthManager.enabled=true 
 
-
+cilium install --set bandwidthManager.enabled=true --set global.containerRuntime.integration="containerd" --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
 
 # Working
 #helm install cilium cilium/cilium \
