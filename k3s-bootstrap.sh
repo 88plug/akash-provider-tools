@@ -165,7 +165,7 @@ else
 echo "☸️ Skipping GPU"
 fi
 
-function k3sup(){
+function k3sup_install(){
 curl -LS https://get.k3sup.dev | sh
 k3sup install --local --user root --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
 chmod 600 /etc/rancher/k3s/k3s.yaml
@@ -183,9 +183,9 @@ grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 15
 } 
 echo "☸️ Installing k3sup"
-k3sup &>> /home/akash/logs/installer/k3sup.log
+k3sup_install &>> /home/akash/logs/installer/k3sup.log
 
-function k3s(){
+function k3s_install(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
 chmod 600 /etc/rancher/k3s/k3s.yaml
 mkdir -p /home/akash/.kube
@@ -202,20 +202,23 @@ grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 15
 } 
 # echo "☸️ Installing k3s"
-# k3s &>> /home/akash/logs/installer/k3s.log
+# k3s_install &>> /home/akash/logs/installer/k3s.log
 
 chown -R akash:akash /home/akash/.kube/
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-function cilium(){
-#wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
-#chmod +x cilium-linux-amd64.tar.gz
-#tar xzvf cilium-linux-amd64.tar.gz 
-#chmod +x cilium
-#chown akash:akash cilium
-#mv cilium /usr/local/bin/
-#rm -f cilium-linux-amd64.tar.gz
+function cilium_install(){
+wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
+chmod +x cilium-linux-amd64.tar.gz
+tar xzvf cilium-linux-amd64.tar.gz 
+chmod +x cilium
+chown akash:akash cilium
+mv cilium /usr/local/bin/
+rm -f cilium-linux-amd64.tar.gz
+cilium install --helm-set bandwidthManager=true --helm-set global.containerRuntime.integration="containerd" --helm-set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
+
+
 
 # Working
 #helm install cilium cilium/cilium \
@@ -223,20 +226,20 @@ function cilium(){
 #    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
 #    --set global.kubeProxyReplacement="strict" --namespace kube-system
 
-helm repo add cilium https://helm.cilium.io/
-helm install cilium cilium/cilium --version 1.13.3 \
-   --namespace kube-system \
-   --set operator.replicas=1 \
-   --set global.containerRuntime.integration="containerd" \
-   --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
-   --set global.bandwidthManager="true"
+#helm repo add cilium https://helm.cilium.io/
+#helm install cilium cilium/cilium --version 1.13.3 \
+#   --namespace kube-system \
+#   --set operator.replicas=1 \
+#   --set global.containerRuntime.integration="containerd" \
+#   --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
+#   --set global.bandwidthManager="true"
 
 
 # Not needed
 #--set global.kubeProxyReplacement="strict" --namespace kube-system
 }
 echo "🕸️ Installing cilium"
-cilium &>> /home/akash/logs/installer/cilium.log
+cilium_install &>> /home/akash/logs/installer/cilium.log
 
 echo "Checking cluster is up..."
 kubectl get pods -A -o wide
