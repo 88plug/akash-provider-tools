@@ -165,7 +165,25 @@ else
 echo "☸️ Skipping GPU"
 fi
 
-
+function k3sup(){
+curl -sLS https://get.k3sup.dev | sh
+k3sup install --local --user root --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
+chmod 600 /etc/rancher/k3s/k3s.yaml
+mkdir -p /home/akash/.kube
+# Not all apps use the new default of "config"
+cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/config
+cp /etc/rancher/k3s/k3s.yaml /home/akash/.kube/kubeconfig
+chown akash:akash /etc/rancher/k3s/k3s.yaml
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /home/akash/.bashrc
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> /etc/profile
+source /home/akash/.bashrc
+# Breaking if we do not wait!
+echo "Waiting 15 seconds for k3s to settle..."
+grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+sleep 15
+} 
+echo "☸️ Installing k3sup"
+k3sup &>> /home/akash/logs/installer/k3sup.log
 
 function k3s(){
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disable=traefik --disable servicelb --disable metrics-server --disable-network-policy" sh -s -
@@ -183,8 +201,8 @@ echo "Waiting 15 seconds for k3s to settle..."
 grep nvidia /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 sleep 15
 } 
-echo "☸️ Installing k3s"
-k3s &>> /home/akash/logs/installer/k3s.log
+# echo "☸️ Installing k3s"
+# k3s &>> /home/akash/logs/installer/k3s.log
 
 chown -R akash:akash /home/akash/.kube/
 
