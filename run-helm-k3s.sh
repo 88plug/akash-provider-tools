@@ -22,7 +22,50 @@ kubectl create ns akash-services
 kubectl label ns akash-services akash.network/name=akash-services akash.network=true
 kubectl create ns lease
 kubectl label ns lease akash.network=true
+
 kubectl apply -f https://raw.githubusercontent.com/akash-network/provider/v0.2.1/pkg/apis/akash.network/crd.yaml
+
+# Ingress Operator
+ingress_charts(){
+cat > ingress-nginx-custom.yaml << EOF
+controller:
+  service:
+    type: ClusterIP
+  ingressClassResource:
+    name: "akash-ingress-class"
+  kind: DaemonSet
+  hostPort:
+    enabled: true
+  admissionWebhooks:
+    port: 7443
+  config:
+    allow-snippet-annotations: false
+    enable-real-ip: true
+    proxy-buffer-size: "16k"
+  metrics:
+    enabled: true
+  extraArgs:
+    enable-ssl-passthrough: true
+tcp:
+  "1317": "akash-services/akash-node-1:1317"
+  "8443": "akash-services/akash-provider:8443"
+  "9090":  "akash-services/akash-node-1:9090"
+  "26656": "akash-services/akash-node-1:26656"
+  "26657": "akash-services/akash-node-1:26657"
+EOF
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+
+kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
+kubectl label ingressclass akash-ingress-class akash.network=true
+
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+  --version 4.7.0 \
+  --namespace ingress-nginx --create-namespace \
+  -f ingress-nginx-custom.yaml
+}
+ingress_charts
 
 # Node
 helm upgrade --install akash-node akash/akash-node -n akash-services \
@@ -65,46 +108,3 @@ helm upgrade --install akash-hostname-operator akash/akash-hostname-operator -n 
 
 # Inventory Operator
 helm upgrade --install inventory-operator akash/akash-inventory-operator -n akash-services
-
-# Ingress Operator
-ingress_charts(){
-cat > ingress-nginx-custom.yaml << EOF
-controller:
-  service:
-    type: ClusterIP
-  ingressClassResource:
-    name: "akash-ingress-class"
-  kind: DaemonSet
-  hostPort:
-    enabled: true
-  admissionWebhooks:
-    port: 7443
-  config:
-    allow-snippet-annotations: false
-    enable-real-ip: true
-    proxy-buffer-size: "16k"
-  metrics:
-    enabled: true
-  extraArgs:
-    enable-ssl-passthrough: true
-tcp:
-  "1317": "akash-services/akash-node-1:1317"
-  "8443": "akash-services/akash-provider:8443"
-  "9090":  "akash-services/akash-node-1:9090"
-  "26656": "akash-services/akash-node-1:26656"
-  "26657": "akash-services/akash-node-1:26657"
-EOF
-
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-
-helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-  --version 4.7.0 \
-  --namespace ingress-nginx --create-namespace \
-  -f ingress-nginx-custom.yaml
-  
-kubectl label ns ingress-nginx app.kubernetes.io/name=ingress-nginx app.kubernetes.io/instance=ingress-nginx
-kubectl label ingressclass akash-ingress-class akash.network=true
-
-}
-ingress_charts
