@@ -23,6 +23,8 @@ kubectl label ns akash-services akash.network/name=akash-services akash.network=
 kubectl create ns lease
 kubectl label ns lease akash.network=true
 
+kubectl apply -f https://raw.githubusercontent.com/akash-network/provider/v0.2.1/pkg/apis/akash.network/crd.yaml
+
 # Node
 helm upgrade --install akash-node akash/akash-node -n akash-services \
   --set akash_node.api_enable=true \
