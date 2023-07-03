@@ -218,7 +218,7 @@ mv cilium /usr/local/bin/
 rm -f cilium-linux-amd64.tar.gz
 
 # cilium install --set kubeProxyReplacement=strict --set bandwidthManager.enabled=true --set global.containerRuntime.integration="containerd" --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
-cilium install --set bandwidthManager.enabled=true
+cilium install --set kubeProxyReplacement=strict --set bandwidthManager.enabled=true
 
 #Very much needed!
 # cilium config set kube-proxy-replacement strict
