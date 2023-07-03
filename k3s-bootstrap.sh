@@ -217,7 +217,10 @@ chown akash:akash cilium
 mv cilium /usr/local/bin/
 rm -f cilium-linux-amd64.tar.gz
 
-cilium install --set bandwidthManager.enabled=true --set global.containerRuntime.integration="containerd" --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
+cilium install --set kubeProxyReplacement=strict --set bandwidthManager.enabled=true --set global.containerRuntime.integration="containerd" --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
+
+#Very much needed!
+# cilium config set kube-proxy-replacement strict
 
 # Working
 #helm install cilium cilium/cilium \
@@ -232,10 +235,6 @@ cilium install --set bandwidthManager.enabled=true --set global.containerRuntime
 #   --set global.containerRuntime.integration="containerd" \
 #   --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
 #   --set global.bandwidthManager="true"
-
-
-# Not needed
-#--set global.kubeProxyReplacement="strict" --namespace kube-system
 }
 echo "🕸️ Installing cilium"
 cilium_install &>> /home/akash/logs/installer/cilium.log
