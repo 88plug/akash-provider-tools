@@ -1,5 +1,6 @@
+#!/bin/bash
 export KUBECONFIG=/home/akash/.kube/kubeconfig
-. variables
+. /home/akash/variables
 #####################################################
 DOMAIN="$DOMAIN"
 ACCOUNT_ADDRESS="$ACCOUNT_ADDRESS"
@@ -89,10 +90,10 @@ helm upgrade --install akash-provider akash/provider -n akash-services \
              --set attributes[6].key=network_upload --set attributes[6].value=$UPLOAD \
              --set attributes[7].key=status --set attributes[7].value=https://status.$DOMAIN \
              --set from=$ACCOUNT_ADDRESS \
-             --set key="$(cat ./key.pem | base64)" \
+             --set key="$(cat /home/akash/key.pem | base64)" \
              --set keysecret="$(echo $KEY_SECRET | base64)" \
              --set domain=$DOMAIN \
-             --set bidpricescript="$(cat bid-engine-script.sh | openssl base64 -A)" \
+             --set bidpricescript="$(cat /home/akash/bid-engine-script.sh | openssl base64 -A)" \
              --set node=$NODE \
              --set log_restart_patterns="rpc node is not catching up|bid failed" \
              --set resources.limits.cpu="2" \
