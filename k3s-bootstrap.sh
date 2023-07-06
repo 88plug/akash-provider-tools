@@ -351,7 +351,9 @@ wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-e
 chmod +x run-helm-k3s.sh ; chmod +x bid-engine-script.sh
 chown akash:akash *.sh
 ./run-helm-k3s.sh 
+fi
 }
+
 echo "🌐 Installing Akash Provider and Node"
 provider_install &>> /home/akash/logs/installer/provider.log
 
