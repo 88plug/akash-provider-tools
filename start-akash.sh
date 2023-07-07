@@ -35,8 +35,8 @@ EOF
   kubectl get pods -A -o wide
   
   #Required for GPUs on Testnet
-  kubectl label node akash-node1 akash.network/capabilities.gpu.vendor.nvidia.model.1080=true
-  kubectl label node akash-node1 akash.network/capabilities.gpu.vendor.nvidia.model.3080ti=true
+  # kubectl label node akash-node1 akash.network/capabilities.gpu.vendor.nvidia.model.1080=true
+  # kubectl label node akash-node1 akash.network/capabilities.gpu.vendor.nvidia.model.3080ti=true
 
   # Set GPU_ENABLED to true
   echo "GPU_ENABLED=true" >> variables
