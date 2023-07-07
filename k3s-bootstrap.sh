@@ -343,7 +343,7 @@ chmod +x run-helm-k3s-testnet.sh ; chmod +x bid-engine-script-testnet.sh
 mv run-helm-k3s-testnet.sh run-helm-k3s.sh
 mv bid-engine-script-testnet.sh bid-engine-script.sh
 chown akash:akash *.sh
-./run-helm-k3s.sh
+echo "Running Helm Provider install after first reboot to get nvidia-smi"
 else
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/run-helm-k3s.sh
 wget -q https://raw.githubusercontent.com/88plug/akash-provider-tools/main/bid-engine-script.sh
