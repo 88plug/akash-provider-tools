@@ -212,6 +212,7 @@ echo "☸️ Installing GPU : Patience is a virtue."
 gpu &>> /home/akash/logs/installer/gpu.log
 else
 echo "☸️ Skipping GPU"
+fi
 
 if [[ $CLIENT_NODE_ == "false" ]]; then
 
