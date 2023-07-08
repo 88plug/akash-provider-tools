@@ -4,6 +4,7 @@ mkdir -p  /home/akash/logs/installer
 echo "Install logs are available in /home/akash/logs/installer if anything breaks"
 
 function user_input(){
+
 while true; do
     clear
     read -p "Is this setup for a client node? (y/n, default: n): " choice
@@ -28,32 +29,54 @@ while true; do
     esac
 done
 
-if [[ $CLIENT_NODE_ == "true" ]]; then
-while true
-do
-clear
-read -p "Enter hostname to use for this additional node (akash-node2) : " CLIENT_HOSTNAME_
-read -p "Are you sure the hostname is correct? : $CLIENT_HOSTNAME_ (y/n)? " choice
-case "$choice" in
-  y|Y ) break;;
-  n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
-done
+if [[ $CLIENT_NODE_ == true ]]; then
+    while true; do
+        clear
+        read -p "Enter the hostname to use for this additional node (default: akash-node2): " CLIENT_HOSTNAME_
+        
+        if [[ -z $CLIENT_HOSTNAME_ ]]; then
+            CLIENT_HOSTNAME_="akash-node2"
+        fi
+        
+        read -p "Are you sure the hostname is correct? ($CLIENT_HOSTNAME_) (y/n): " choice
+        
+        case "$choice" in
+            y|Y ) 
+                break
+                ;;
+            n|N ) 
+                echo "Please try again."
+                sleep 2
+                ;;
+            * ) 
+                echo "Invalid entry. Please enter 'y' for yes or 'n' for no."
+                sleep 2
+                ;;
+        esac
+    done
 fi
 
-if [[ $CLIENT_NODE_ == "true" ]]; then
-while true
-do
-clear
-read -p "What is the IP of akash-node1? : " AKASH_NODE_1_IP_
-read -p "Are you sure the IP of akash-node1 is correct? : $AKASH_NODE_1_IP_ (y/n)? " choice
-case "$choice" in
-  y|Y ) break;;
-  n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
-done
+if [[ $CLIENT_NODE_ == true ]]; then
+    while true; do
+        clear
+        read -p "What is the IP address of akash-node1? : " AKASH_NODE_1_IP_
+        
+        read -p "Are you sure the IP address of akash-node1 is correct? ($AKASH_NODE_1_IP_) (y/n): " choice
+        
+        case "$choice" in
+            y|Y ) 
+                break
+                ;;
+            n|N ) 
+                echo "Please try again."
+                sleep 2
+                ;;
+            * ) 
+                echo "Invalid entry. Please enter 'y' for yes or 'n' for no."
+                sleep 2
+                ;;
+        esac
+    done
 fi
 
 
