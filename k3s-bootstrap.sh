@@ -517,6 +517,13 @@ chown akash:akash variables
 
 # End node client mode skip
 fi
+
+if [[ $CLIENT_NODE_ == true ]]; then
+echo "CLIENT_NODE=true" >> variables
+else
+echo "CLIENT_NODE=false" >> variables
+fi
+
 echo "SETUP_COMPLETE=true" >> variables
 
 
