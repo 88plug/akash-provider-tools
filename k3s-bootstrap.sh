@@ -4,16 +4,28 @@ mkdir -p  /home/akash/logs/installer
 echo "Install logs are available in /home/akash/logs/installer if anything breaks"
 
 function user_input(){
-#Check what user has
-while true
-do
-clear
-read -p "Is this a client node - default is no. (y/n) " choice
-case "$choice" in
-  y|Y ) CLIENT_NODE_=true; break;;
-  n|N ) echo "Node will be setup as akash-node1" ; CLIENT_NODE=false; sleep 5 ; break;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
+while true; do
+    clear
+    read -p "Is this setup for a client node? (y/n, default: n): " choice
+
+    case "$choice" in
+        y|Y ) 
+            CLIENT_NODE_=true
+            echo "Client node setup selected."
+            sleep 2
+            break
+            ;;
+        n|N ) 
+            CLIENT_NODE_=false
+            echo "Initial setup for akash-node1 selected."
+            sleep 2
+            break
+            ;;
+        * )
+            echo "Invalid entry. Please enter 'y' for client node or 'n' for initial setup."
+            sleep 2
+            ;;
+    esac
 done
 
 if [[ $CLIENT_NODE_ == "true" ]]; then
