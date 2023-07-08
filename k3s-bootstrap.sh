@@ -520,14 +520,14 @@ fi
 
 if [[ $CLIENT_NODE_ == true ]]; then
 echo "CLIENT_NODE=true" >> variables
+echo "CLIENT_HOSTNAME=$CLIENT_HOSTNAME_" >> variables
+echo "AKASH_NODE_1_IP=$AKASH_NODE_1_IP_" >> variables
 else
 echo "CLIENT_NODE=false" >> variables
+echo "CLIENT_HOSTNAME=akash-node1" >> variables
 fi
 
 echo "SETUP_COMPLETE=true" >> variables
-
-
-
 
 echo "Setup Complete"
 echo "Rebooting ..."
