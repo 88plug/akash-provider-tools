@@ -130,49 +130,82 @@ if [[ $CLIENT_NODE_ == "false" ]]; then
   # End of client node check
 fi
 
-#GPU Support#
+# GPU Support
 if lspci | grep -q NVIDIA; then
-while true
-do
-clear
-read -p "NVIDIA GPU Detected : Would you like to enable it on this host? (y/n)? : " GPU_
-read -p "Are you sure you want to enable GPU support? : $GPU_ (y/n)? " choice
-case "$choice" in
-  y|Y ) GPU_=true ; break;;
-  n|N ) echo "Skipping GPU support" ; GPU_=false ; sleep 3;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
-done
+  while true; do
+    clear
+    read -p "NVIDIA GPU Detected: Would you like to enable it on this host? (y/n): " GPU_
+    
+    read -p "Are you sure you want to enable GPU support? ($GPU_) (y/n): " choice
+    
+    case "$choice" in
+        y|Y ) 
+            GPU_=true
+            break
+            ;;
+        n|N ) 
+            echo "Skipping GPU support."
+            GPU_=false
+            sleep 3
+            break
+            ;;
+        * )
+            echo "Invalid entry. Please enter 'y' for yes or 'n' for no."
+            sleep 3
+            ;;
+    esac
+  done
 fi
 
 if [[ $CLIENT_NODE_ == "false" ]]; then
-#Domain is required
-while true
-do
-clear
-read -p "Enter provider domain name to use for your provider (example.com) : " DOMAIN_
-read -p "Are you sure the provider domain is correct? : $DOMAIN_ (y/n)? " choice
-case "$choice" in
-  y|Y ) break;;
-  n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
-done
+  # Domain is required
+  while true; do
+    clear
+    read -p "Enter the provider domain name to use for your provider (example.com): " DOMAIN_
+    
+    read -p "Are you sure the provider domain is correct? ($DOMAIN_) (y/n): " choice
+    
+    case "$choice" in
+        y|Y ) 
+            break
+            ;;
+        n|N ) 
+            echo "Please try again."
+            sleep 2
+            ;;
+        * )
+            echo "Invalid entry. Please enter 'y' for yes or 'n' for no."
+            sleep 2
+            ;;
+    esac
+  done
 
-#Dynamic or Static Public IP?
-while true
-do
-clear
-read -p "Do you have a dynamic or static IP address? : $ip_ (dynamic/static)? " choice
-case "$choice" in
-  dynamic|DYNAMIC ) echo "You chose dynamic IP" ; ip_=dynamic ; break;;
-  static|STATIC ) echo "You chose static" ;  ip_=static ; break;;
-  * ) echo "Invalid entry, please try again with dynamic or static";;
-esac
-done 
+  # Dynamic or Static Public IP?
+  while true; do
+    clear
+    read -p "Do you have a dynamic or static IP address? ($ip_) (dynamic/static): " choice
+    
+    case "$choice" in
+        dynamic|DYNAMIC ) 
+            ip_=dynamic
+            echo "You chose dynamic IP."
+            break
+            ;;
+        static|STATIC ) 
+            ip_=static
+            echo "You chose static IP."
+            break
+            ;;
+        * )
+            echo "Invalid entry. Please enter 'dynamic' or 'static'."
+            sleep 2
+            ;;
+    esac
+  done 
 
-#End client_node mode check
+  # End of client_node mode check
 fi
+
 
 
 if [[ $ip_ == "dynamic" ]]; then
