@@ -79,37 +79,55 @@ if [[ $CLIENT_NODE_ == true ]]; then
     done
 fi
 
-
 if [[ $CLIENT_NODE_ == "false" ]]; then
-#Check what user has
-while true
-do
-clear
-#read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) : " NEW_WALLET_
-read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) " choice
-case "$choice" in
-  y|Y ) NEW_WALLET_=false; break;;
-  n|N ) echo "New wallet required during setup" ; NEW_WALLET_=true; sleep 5 ; break;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
-done
+  # Check if the user has an Akash wallet
+  while true; do
+    clear
+    read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) " choice
 
-#Import key if the user knows it
-if [[ $NEW_WALLET_ == "false" ]]; then
-while true
-do
-clear
-read -p "Enter mnemonic phrase to import your provider wallet (KING SKI GOAT...) : " mnemonic_
-read -p "Are you sure the wallet mnemonic is correct? : $mnemonic_ (y/n)? " choice
-case "$choice" in
-  y|Y ) break;;
-  n|N ) echo "Try again" ; sleep 3;;
-  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
-esac
-done
-fi
+    case "$choice" in
+        y|Y ) 
+            NEW_WALLET_=false
+            break
+            ;;
+        n|N ) 
+            echo "New wallet required during setup."
+            NEW_WALLET_=true
+            sleep 2
+            break
+            ;;
+        * )
+            echo "Invalid entry. Please enter 'y' for yes or 'n' for no."
+            sleep 2
+            ;;
+    esac
+  done
 
-#End client node check
+  # Import key if the user knows it
+  if [[ $NEW_WALLET_ == "false" ]]; then
+    while true; do
+      clear
+      read -p "Enter the mnemonic phrase to import your provider wallet (e.g., KING SKI GOAT...): " mnemonic_
+
+      read -p "Are you sure the wallet mnemonic is correct? ($mnemonic_) (y/n): " choice
+        
+      case "$choice" in
+          y|Y ) 
+              break
+              ;;
+          n|N ) 
+              echo "Please try again."
+              sleep 2
+              ;;
+          * ) 
+              echo "Invalid entry. Please enter 'y' for yes or 'n' for no."
+              sleep 2
+              ;;
+      esac
+    done
+  fi
+
+  # End of client node check
 fi
 
 #GPU Support#
