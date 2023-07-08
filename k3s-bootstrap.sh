@@ -8,6 +8,48 @@ function user_input(){
 while true
 do
 clear
+read -p "Is this a client node - default is no. (y/n) " choice
+case "$choice" in
+  y|Y ) CLIENT_NODE_=true; break;;
+  n|N ) echo "Node will be setup as akash-node1" ; CLIENT_NODE=false; sleep 5 ; break;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
+esac
+done
+
+if [[ $CLIENT_NODE_ == "true" ]]; then
+while true
+do
+clear
+read -p "Enter hostname to use for this additional node (akash-node2) : " CLIENT_HOSTNAME_
+read -p "Are you sure the hostname is correct? : $CLIENT_HOSTNAME_ (y/n)? " choice
+case "$choice" in
+  y|Y ) break;;
+  n|N ) echo "Try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
+esac
+done
+fi
+
+if [[ $CLIENT_NODE_ == "true" ]]; then
+while true
+do
+clear
+read -p "What is the IP of akash-node1? : " AKASH_NODE_1_IP_
+read -p "Are you sure the IP of akash-node1 is correct? : $AKASH_NODE_1_IP_ (y/n)? " choice
+case "$choice" in
+  y|Y ) break;;
+  n|N ) echo "Try again" ; sleep 3;;
+  * ) echo "Invalid entry, please try again with Y or N" ; sleep 3;;
+esac
+done
+fi
+
+
+if [[ $CLIENT_NODE_ == "false" ]]; then
+#Check what user has
+while true
+do
+clear
 #read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) : " NEW_WALLET_
 read -p "Do you have an Akash wallet with at least 50 AKT and the mnemonic phrase available? (y/n) " choice
 case "$choice" in
@@ -32,6 +74,9 @@ esac
 done
 fi
 
+#End client node check
+fi
+
 #GPU Support#
 if lspci | grep -q NVIDIA; then
 while true
@@ -47,6 +92,7 @@ esac
 done
 fi
 
+if [[ $CLIENT_NODE_ == "false" ]]; then
 #Domain is required
 while true
 do
@@ -129,6 +175,10 @@ echo ""
 #Store securely for user
 KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
+#End client_node mode check
+fi
+
+
 function depends(){
 export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get dist-upgrade -yqq
@@ -162,7 +212,8 @@ echo "☸️ Installing GPU : Patience is a virtue."
 gpu &>> /home/akash/logs/installer/gpu.log
 else
 echo "☸️ Skipping GPU"
-fi
+
+if [[ $CLIENT_NODE_ == "false" ]]; then
 
 function k3sup_install(){
 curl -LS https://get.k3sup.dev | sh
@@ -375,6 +426,8 @@ chown akash:akash variables
 #echo "Please forward these ports to the IP of this machine"
 #cat ./firewall-ports.txt
 
+# End node client mode skip
+fi
 echo "SETUP_COMPLETE=true" >> variables
 
 
