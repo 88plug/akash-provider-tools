@@ -118,6 +118,10 @@ case "$choice" in
 esac
 done 
 
+#End client_node mode check
+fi
+
+
 if [[ $ip_ == "dynamic" ]]; then
 echo "Dynamic IP Detected"
   echo "You must use a Dynamic DNS / No-IP service."
@@ -175,8 +179,6 @@ echo ""
 #Store securely for user
 KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
-#End client_node mode check
-fi
 
 
 function depends(){
