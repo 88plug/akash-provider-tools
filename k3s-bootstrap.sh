@@ -522,6 +522,10 @@ if [[ $CLIENT_NODE_ == true ]]; then
 echo "CLIENT_NODE=true" >> variables
 echo "CLIENT_HOSTNAME=$CLIENT_HOSTNAME_" >> variables
 echo "AKASH_NODE_1_IP=$AKASH_NODE_1_IP_" >> variables
+# Setup hostname for client node
+hostnamectl set-hostname $CLIENT_HOSTNAME_
+echo $CLIENT_HOSTNAME_ | tee /etc/hostname
+sed -i "s/127.0.1.1 akash-node1/127.0.1.1 $CLIENT_HOSTNAME_/g" /etc/hosts
 else
 echo "CLIENT_NODE=false" >> variables
 echo "CLIENT_HOSTNAME=akash-node1" >> variables
