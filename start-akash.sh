@@ -74,7 +74,7 @@ EOF
   k3s kubectl delete pod nbody-gpu-benchmark
 }
 
-if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables; then
+if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables && ! grep -q "CLIENT_NODE=true"; then
   ./run-helm-k3s.sh
   configure_gpu
   create_test_pod
