@@ -312,7 +312,12 @@ curl -LS https://get.k3sup.dev | sh
 
 LOCAL_IP=$(ip -4 addr show | grep enp* | grep -oP 'inet \K[\d.]+')
 echo "Found local ip of $LOCAL_IP" 
-k3sup install --ip $LOCAL_IP --token $KEY_SECRET_ --user akash --tls-san balance.$DOMAIN_ --cluster --k3s-extra-args "--disable-servicelb --disable-traefik --disable-metrics-server --disable-network-policy --flannel-backend=none"
+# k3sup install --ip $LOCAL_IP --token $KEY_SECRET_ --user akash --tls-san balance.$DOMAIN_ --cluster --k3s-extra-args "--disable-servicelb --disable-traefik --disable-metrics-server --disable-network-policy --flannel-backend=none"
+
+apt-get install -y sshpass
+sshpass -p 'akash' ssh-copy-id -i /home/akash/.ssh/id_rsa.pub -o StrictHostKeyChecking=no akash@$LOCAL_IP
+
+k3sup install --ip $LOCAL_IP --user akash --cluster --k3s-extra-args "--disable-servicelb --disable-traefik --disable-metrics-server --disable-network-policy --flannel-backend=none"
 
 chmod 600 /etc/rancher/k3s/k3s.yaml
 mkdir -p /home/akash/.kube
