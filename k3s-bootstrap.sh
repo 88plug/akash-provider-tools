@@ -533,6 +533,9 @@ echo "CLIENT_NODE=false" >> variables
 echo "CLIENT_HOSTNAME=akash-node1" >> variables
 fi
 
+#Must be enabled for k3sup to add nodes properly
+echo 'akash ALL=(ALL) NOPASSWD:ALL' | tee -a /etc/sudoers
+
 echo "SETUP_COMPLETE=true" >> variables
 
 echo "Setup Complete"
