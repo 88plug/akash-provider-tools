@@ -308,7 +308,7 @@ function k3sup_install(){
 curl -LS https://get.k3sup.dev | sh
 #Previous working before multi-node
 # k3sup install --local --user root --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
-k3sup install --local --token $KEY_SECRET_ --user akash --tls-san balance.$DOMAIN_ --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
+k3sup install --local --token $KEY_SECRET_ --user root --tls-san balance.$DOMAIN_ --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
 chmod 600 /etc/rancher/k3s/k3s.yaml
 mkdir -p /home/akash/.kube
 # Not all apps use the new default of "config"
