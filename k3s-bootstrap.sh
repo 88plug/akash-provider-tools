@@ -559,6 +559,8 @@ echo "AKASH_NODE_1_IP=$AKASH_NODE_1_IP_" >> variables
 hostnamectl set-hostname $CLIENT_HOSTNAME_
 echo $CLIENT_HOSTNAME_ | tee /etc/hostname
 sed -i "s/127.0.1.1 akash-node1/127.0.1.1 $CLIENT_HOSTNAME_/g" /etc/hosts
+#Must get this for remote installs to it
+echo 'akash ALL=(ALL) NOPASSWD:ALL' | tee -a /etc/sudoers
 else
 echo "CLIENT_NODE=false" >> variables
 echo "CLIENT_HOSTNAME=akash-node1" >> variables
