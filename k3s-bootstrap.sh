@@ -310,6 +310,7 @@ curl -LS https://get.k3sup.dev | sh
 #k3sup install --local --user root --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
 
 LOCAL_IP=$(ip -4 addr show | grep enp* | grep -oP 'inet \K[\d.]+')
+echo 'akash ALL=(ALL) NOPASSWD:ALL' | tee -a /etc/sudoers
 
 apt-get install -y sshpass
 
