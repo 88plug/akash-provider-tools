@@ -307,7 +307,16 @@ if [[ $CLIENT_NODE_ == "false" ]]; then
 function k3sup_install(){
 curl -LS https://get.k3sup.dev | sh
 #Previous working before multi-node
-k3sup install --local --user root --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
+#k3sup install --local --user root --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
+
+LOCAL_IP=$(ip -4 addr show | grep enp* | grep -oP 'inet \K[\d.]+')
+
+apt-get install -y sshpass
+
+sshpass -p 'akash' ssh-copy-id -i /home/akash/.ssh/id_rsa.pub -o StrictHostKeyChecking=no akash@$LOCAL_IP
+sshpass -p 'akash' ssh-copy-id -i /home/akash/.ssh/id_rsa.pub -o StrictHostKeyChecking=no akash@127.0.0.1
+
+k3sup install --cluster --user akash --ip $LOCAL_IP --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable network-policy --flannel-backend=none"
 
 function tester(){
 # k3sup install --local --token $KEY_SECRET_ --user root --tls-san balance.$DOMAIN_ --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
