@@ -75,6 +75,41 @@ EOF
 }
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables && ! grep -q "CLIENT_NODE=true" variables; then
+
+# Check if the machine can ping google.com
+if ping -c 1 google.com &> /dev/null
+then
+  echo "Internet is OK."
+else
+  echo "Internet connection failed. Please check your network."
+  exit 1
+fi
+
+# Check if Kubernetes is running by checking the existence of the `kubectl` command
+if ! command -v kubectl get pods -A -o wide &> /dev/null
+then
+  echo "Kubernetes is not running. Please start your Kubernetes cluster."
+  exit 1
+fi
+
+echo "Kubernetes is running."
+
+# Wait until the 'cilium-*' pod is Running
+while true; do
+    # Get the status of the 'cilium-*' pod
+    CILIUM_POD_STATUS=$(kubectl get pods -n kube-system | grep 'cilium' | awk '{print $3}' | tail -n1)
+
+    # Check if the pod is Running
+    if [[ $CILIUM_POD_STATUS == "Running" ]]; then
+        echo "The 'cilium' pod is Running."
+        break
+    else
+        echo "The 'cilium' pod is not Running yet. Waiting..."
+        sleep 10
+    fi
+done
+
+  
   ./run-helm-k3s.sh
   configure_gpu
   create_test_pod
