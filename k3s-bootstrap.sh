@@ -342,7 +342,7 @@ apt-get install -y sshpass
 sshpass -p 'akash' ssh-copy-id -i /home/akash/.ssh/id_rsa.pub -o StrictHostKeyChecking=no akash@$LOCAL_IP
 
 # k3sup install --user akash --ip $LOCAL_IP --cluster --k3s-extra-args "--disable-servicelb --disable-traefik --disable-metrics-server --disable-network-policy --flannel-backend=none"
-k3sup install --user akash --ip $LOCAL_IP --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable network-policy --flannel-backend=none"
+# k3sup install --user akash --ip $LOCAL_IP --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable network-policy --flannel-backend=none"
 }
 #tester - not working
 
@@ -419,9 +419,24 @@ cilium install --set kubeProxyReplacement=strict --set bandwidthManager.enabled=
 echo "🕸️ Installing cilium"
 cilium_install &>> /home/akash/logs/installer/cilium.log
 
-echo "Checking cluster is up..."
+echo "Sleep 90 seconds for Cilium then checking Cilium and Cluster are up..."
+sleep 90
+
+cilium status
+
+# Check the exit status of the 'cilium status' command
+if [ $? -ne 0 ]; then
+    echo "Error: Cilium status check failed"
+    exit 1
+fi
+
 kubectl get pods -A -o wide
 
+# Check the exit status of the 'kubectl get pods -A -o wide' command
+if [ $? -ne 0 ]; then
+    echo "Error: kubectl get pods command failed"
+    exit 1
+fi
 
 #k3sup install --ip $SERVER_IP --user $USER --cluster --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none"
 #sleep 10
