@@ -76,23 +76,6 @@ EOF
 
 if lspci | grep -q NVIDIA && ! grep -q "GPU_ENABLED=true" variables && ! grep -q "CLIENT_NODE=true" variables; then
 
-# Check if the machine can ping google.com
-if ping -c 1 google.com &> /dev/null
-then
-  echo "Internet is OK."
-else
-  echo "Internet connection failed. Please check your network."
-  exit 1
-fi
-
-# Check if Kubernetes is running by checking the existence of the `kubectl` command
-if ! command -v kubectl get pods -A -o wide &> /dev/null
-then
-  echo "Kubernetes is not running. Please start your Kubernetes cluster."
-  exit 1
-fi
-
-echo "Kubernetes is running."
 
 # Wait until the 'cilium-*' pod is Running
 while true; do
