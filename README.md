@@ -1,6 +1,43 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+
+# Limit User bandwidth on every pod
+Create /etc/systemd/system/limits.service
+```
+[Unit]
+Description=Run limits.sh script every 60 seconds
+
+[Service]
+ExecStart=/bin/bash -c 'while true; do /root/limits.sh; echo "Sleeping 60 seconds"; sleep 60; done'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Create limits.sh
+```
+#!/bin/bash
+
+export KUBECONFIG=/root/kubeconfig
+echo "Starting to patch with 1G down and 1M up per pod"
+
+deployments=$(kubectl get deployments -A | grep -E 'softether|dante|honeygain|cc-worker|pkt|miner|xmrig' | awk '{print $1,$2}')
+
+while read -r namespace deployment; do
+    echo "Patching $deployment in namespace $namespace"
+    kubectl patch deployment -n "$namespace" "$deployment" -p '{"spec": {"template":{"metadata":{"annotations":{"kubernetes.io/ingress-bandwidth":"50M"}}}}}'
+    kubectl patch deployment -n "$namespace" "$deployment" -p '{"spec": {"template":{"metadata":{"annotations":{"kubernetes.io/egress-bandwidth":"50M"}}}}}'
+done <<< "$deployments"
+```
+Enable with
+```
+systemctl daemon-reload
+systemctl enable --now limit.service
+systemctl status limits
+```
+
 # Upgrade ingress-nginx to new format helm charts
 ```
 Create ingress-nginx-custom.yaml
