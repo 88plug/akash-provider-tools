@@ -185,6 +185,51 @@ akash query market lease list \
       done
 ```
 
+# Zerotier
+
+```
+#Vultr setup script
+
+
+ufw disable
+apt-get remove --purge -y ufw
+
+curl -s https://install.zerotier.com | sudo bash
+zerotier-cli join xxx
+
+# Ensure that we can forward packets between interfaces
+sysctl net.ipv4.ip_forward=1
+sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+
+# Set up iptables rules
+ip link | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2;getline}'
+# eth0        <== This is our physical ethernet
+# ztyou2j6dw  <==This is our ZeroTier Virtual Adapter
+PHY_IFACE="$(ip link | grep 'enp' | awk '{print substr($2,1,length($2)-1)}')"
+ZT_IFACE="$(ip link | grep 'zt' | awk '{print substr($2,1,length($2)-1)}')" # <== This command will grab your ZeroTier interface name
+iptables -t nat -A POSTROUTING -o $PHY_IFACE -j MASQUERADE
+iptables -A FORWARD -i $PHY_IFACE -o $ZT_IFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i $ZT_IFACE -o $PHY_IFACE -j ACCEPT
+
+# Make sure the rules are persistent after reboot/poweroff
+apt-get install -y iptables-persistent
+bash -c iptables-save > /etc/iptables/rules.v4
+
+# Ensure that ZeroTier always comes back up after a reboot
+systemctl enable zerotier-one
+
+
+WORKING!
+FIRST NODE: (can be on LAN/ZT)
+k3sup install --cluster --user akash --ip 192.168.1.x --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none --flannel-iface ztjlhz343e"
+
+Additional Control Plane/SERVERS: (on WAN/ZT)
+k3sup join --user root --ip 45.32.x.x --server-user akash --server-ip 172.24.x.x --server --k3s-extra-args "--disable servicelb --disable traefik --disable metrics-server --disable-network-policy --flannel-backend=none --flannel-iface ztjlhz343e"
+
+AGENTS: (on WAN/ZT)
+k3sup join --user root --ip 45.32.x.x --server-user akash --server-ip 172.24.x.x --k3s-extra-args "--flannel-iface ztjlhz343e"
+```
+
 # Run an Akash Provider with k3sup + zerotier + helm
 
 1.  Setup mysql/postgres server 
