@@ -1,6 +1,31 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Run testnet on a single IP:
+Run SOCAT on a public VPS / port forward the alternative ports to the proper port on firewall.
+```
+[Unit]
+Description=Socat Service
+After=network.target
+
+[Service]
+ExecStartPre=/bin/bash -c "sleep 10" # optional: wait a bit for the network to be ready
+ExecStart=/bin/bash -c '/usr/bin/socat TCP-LISTEN:80,fork TCP:136.24.x.x:38472 & \
+/usr/bin/socat TCP-LISTEN:443,fork TCP:136.24.x.x:38473 & \
+/usr/bin/socat TCP-LISTEN:1317,fork TCP:136.24.x.x:38474 & \
+/usr/bin/socat TCP-LISTEN:26656,fork TCP:136.24.x.x:38475 & \
+/usr/bin/socat TCP-LISTEN:26657,fork TCP:136.24.x.x:38476 & \
+/usr/bin/socat TCP-LISTEN:8443,fork TCP:136.24.x.x:38477'
+Restart=always
+User=root
+Group=root
+Environment=PATH=/usr/bin:/usr/local/bin:/sbin:/bin
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+```
+
 
 # Limit User bandwidth on every pod
 Create /etc/systemd/system/limits.service
