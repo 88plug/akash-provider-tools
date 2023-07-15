@@ -9,6 +9,11 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 function configure_gpu() {
   echo "Detected GPU but not set up. Starting configuration..."
 
+  helm repo add nvidia https://helm.ngc.nvidia.com/nvidia \
+   && helm repo update \
+   && helm install --wait --generate-name --create-namespace --namespace nvidia-device-plugin nvidia/gpu-operator --set driver.enabled=false --set toolkit.enabled=false --set migManager.enabled=false
+
+function working_old(){
   # Add Helm repositories
   helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
   helm repo update
@@ -29,7 +34,7 @@ EOF
     --namespace nvidia-device-plugin \
     --create-namespace \
     --set runtimeClassName="nvidia"
-
+}
   echo "Waiting 60 seconds for the GPU to settle..."
   sleep 60
   kubectl get pods -A -o wide
