@@ -269,7 +269,9 @@ KEY_SECRET_=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
 function depends(){
 export DEBIAN_FRONTEND=noninteractive
-apt-get update && apt-get dist-upgrade -yqq
+apt-get -o Acquire::ForceIPv4=true update
+DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -yqq -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+
 snap install kubectl --classic ; snap install helm --classic
 #Disable sleep
 systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
@@ -289,7 +291,7 @@ echo "Install NVIDIA"
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
 curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | apt-key add -
 curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | tee /etc/apt/sources.list.d/libnvidia-container.list
-apt-get update
+apt-get -o Acquire::ForceIPv4=true update
 ubuntu-drivers autoinstall
 apt-get install -y nvidia-cuda-toolkit nvidia-container-toolkit nvidia-container-runtime 
 fi
