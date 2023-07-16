@@ -1,6 +1,21 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Limit GPU power usage when nodes boot
+```
+[Unit]
+Description=GPU power limit script
+
+[Service]
+ExecStart=/bin/bash /home/akash/gpu-power.sh
+User=root
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+```
+
 # Run testnet on a single IP:
 Run SOCAT on a public VPS / port forward the alternative ports to the proper port on firewall.
 ```
