@@ -1,0 +1,11 @@
+[Unit]
+Description=GPU power limit script
+
+[Service]
+ExecStart=/bin/bash /home/akash/gpu-power.sh
+User=root
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
