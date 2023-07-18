@@ -11,7 +11,7 @@ After=network.target
 
 [Service]
 ExecStartPre=/bin/bash -c "sleep 10" # optional: wait a bit for the network to be ready
-ExecStart=/bin/bash -c 'chisel server --host 137.220.x.x --port 8000 --reverse -v'
+ExecStart=/bin/bash -c 'chisel server --host 137.220.x.x --port 8000 --reverse -v --auth akash:strong_password'
 Restart=always
 User=root
 Group=root
@@ -28,7 +28,7 @@ Description=Chisel Client
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/chisel client -v --keepalive 10m 137.220.x.x:8000 R:137.220.x.x:80:localhost:80 R:137.220.x.x:443:localhost:443 R:137.220.x.x:1317:localhost:1317 R:137.220.x.x:26656:localhost:26656 R:137.220.x.x:26657:localhost:26657 R:137.220.x.x:8443:localhost:8443
+ExecStart=/usr/local/bin/chisel client -v --keepalive 10m --auth akash:strong_password 137.220.x.x:8000 R:137.220.x.x:80:localhost:80 R:137.220.x.x:443:localhost:443 R:137.220.x.x:1317:localhost:1317 R:137.220.x.x:26656:localhost:26656 R:137.220.x.x:26657:localhost:26657 R:137.220.x.x:8443:localhost:8443
 Restart=always
 User=akash
 
