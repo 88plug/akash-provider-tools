@@ -1,6 +1,9 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Run mainnet/testnet over Chisel on a single IP:
+Check out chisel.sh!
+
 # Limit GPU power usage when nodes boot
 ```
 [Unit]
