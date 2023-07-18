@@ -2,6 +2,7 @@
 #SERVER
 #run on akash deployment/vps of your choise!
 INSTALL CHISEL ON BOTH CLIENT AND SERVER - the install systemd services.
+apt-get update ; apt-get install golang ; go install github.com/jpillora/chisel@latest ; cp go/bin/chisel /usr/local/bin/
 
 SERVER/VPS SERVICE
 ---
