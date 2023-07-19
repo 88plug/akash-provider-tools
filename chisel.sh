@@ -82,7 +82,7 @@ Use screen to open all ports
 killall screen
 killall chisel
 # Specify your server IP address and port
-serverIP="149.28.204.32"
+serverIP="207.x.x.x"
 serverPort="8000"
 
 # Specify your local IP address (change this if necessary)
@@ -103,7 +103,7 @@ add_range() {
 }
 
 # Start chisel command with the fixed ports
-command="chisel client -v --keepalive 10m --auth akash:strong_password $serverIP:$serverPort"
+command="chisel client -v --keepalive 1m --auth akash:strong_password $serverIP:$serverPort"
 command+=" R:$serverIP:80:$localIP:80"
 command+=" R:$serverIP:443:$localIP:443"
 command+=" R:$serverIP:1317:$localIP:1317"
@@ -112,13 +112,14 @@ command+=" R:$serverIP:26657:$localIP:26657"
 command+=" R:$serverIP:8443:$localIP:8443"
 screen -dm bash -c "$command"
 
+#Start screens in chunks to not overwhelm memory
 chunk_size=500
 start=30000
 end=32767
 
 for (( i=$start; i<=$end; i+=$chunk_size ))
 do
-    add_range $i $((i + chunk_size - 1))
+    # Use the minimum between i + chunk_size - 1 and the end value
+    add_range $i $(($((i + chunk_size - 1))<$end?$((i + chunk_size - 1)):$end))
 done
-
 
