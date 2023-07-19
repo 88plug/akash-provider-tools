@@ -75,5 +75,50 @@ done
 
 # Print the resulting command
 echo $command
+----
+Use screen to open all ports
+----
+#!/bin/bash
+killall screen
+killall chisel
+# Specify your server IP address and port
+serverIP="149.28.204.32"
+serverPort="8000"
+
+# Specify your local IP address (change this if necessary)
+localIP="localhost"
+
+add_range() {
+    local start=$1
+    local end=$2
+    local command="chisel client -v --keepalive 10m --auth akash:strong_password $serverIP:$serverPort"
+
+    for port in $(seq $start $end)
+    do
+        command+=" R:$serverIP:$port:$localIP:$port"
+    done
+
+    screen -dm bash -c "$command"
+    sleep 10
+}
+
+# Start chisel command with the fixed ports
+command="chisel client -v --keepalive 10m --auth akash:strong_password $serverIP:$serverPort"
+command+=" R:$serverIP:80:$localIP:80"
+command+=" R:$serverIP:443:$localIP:443"
+command+=" R:$serverIP:1317:$localIP:1317"
+command+=" R:$serverIP:26656:$localIP:26656"
+command+=" R:$serverIP:26657:$localIP:26657"
+command+=" R:$serverIP:8443:$localIP:8443"
+screen -dm bash -c "$command"
+
+chunk_size=500
+start=30000
+end=32767
+
+for (( i=$start; i<=$end; i+=$chunk_size ))
+do
+    add_range $i $((i + chunk_size - 1))
+done
 
 
