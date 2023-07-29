@@ -33,7 +33,7 @@ Description=Chisel Client
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/chisel client -v --keepalive 10m --auth akash:strong_password 137.220.x.x:8000 R:137.220.x.x:80:localhost:80 R:137.220.x.x:443:localhost:443 R:137.220.x.x:1317:localhost:1317 R:137.220.x.x:26656:localhost:26656 R:137.220.x.x:26657:localhost:26657 R:137.220.x.x:8443:localhost:8443
+ExecStart=/usr/local/bin/chisel client -v --keepalive 1m --auth akash:strong_password 137.220.x.x:8000 R:137.220.x.x:80:localhost:80 R:137.220.x.x:443:localhost:443 R:137.220.x.x:1317:localhost:1317 R:137.220.x.x:26656:localhost:26656 R:137.220.x.x:26657:localhost:26657 R:137.220.x.x:8443:localhost:8443
 Restart=always
 User=akash
 
