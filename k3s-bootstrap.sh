@@ -390,6 +390,8 @@ chown -R akash:akash /home/akash/.kube/
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 function cilium_install(){
+
+#Get Cilium CLI
 wget https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
 chmod +x cilium-linux-amd64.tar.gz
 tar xzvf cilium-linux-amd64.tar.gz 
@@ -398,25 +400,20 @@ chown akash:akash cilium
 mv cilium /usr/local/bin/
 rm -f cilium-linux-amd64.tar.gz
 
-# cilium install --set kubeProxyReplacement=strict --set bandwidthManager.enabled=true --set global.containerRuntime.integration="containerd" --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock"
-cilium install --set kubeProxyReplacement=strict --set bandwidthManager.enabled=true
+#cilium install --set kubeProxyReplacement=strict --set bandwidthManager.enabled=true
 
-#Very much needed!
-# cilium config set kube-proxy-replacement strict
 
-# Working
-#helm install cilium cilium/cilium \
-#    --set global.containerRuntime.integration="containerd" \
-#    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
-#    --set global.kubeProxyReplacement="strict" --namespace kube-system
+helm repo add cilium https://helm.cilium.io/
+helm repo update
+helm install cilium cilium/cilium --wait \
+    --set operator.replicas=1 \
+    --set global.containerRuntime.integration="containerd" \                            
+    --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
+    --set kubeProxyReplacement=strict \
+    --set bandwidthManager=true \
+    --namespace kube-system
 
-#helm repo add cilium https://helm.cilium.io/
-#helm install cilium cilium/cilium --version 1.13.3 \
-#   --namespace kube-system \
-#   --set operator.replicas=1 \
-#   --set global.containerRuntime.integration="containerd" \
-#   --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
-#   --set global.bandwidthManager="true"
+
 }
 echo "🕸️ Installing cilium"
 cilium_install &>> /home/akash/logs/installer/cilium.log
