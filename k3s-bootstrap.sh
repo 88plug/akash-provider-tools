@@ -407,10 +407,10 @@ helm repo add cilium https://helm.cilium.io/
 helm repo update
 helm install cilium cilium/cilium --wait \
     --set operator.replicas=1 \
-    --set global.containerRuntime.integration="containerd" \                            
+    --set global.containerRuntime.integration="containerd" \
     --set global.containerRuntime.socketPath="/var/run/k3s/containerd/containerd.sock" \
     --set kubeProxyReplacement=strict \
-    --set bandwidthManager=true \
+    --set global.bandwidthManager=true \
     --namespace kube-system
 
 
