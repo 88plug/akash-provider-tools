@@ -6,7 +6,7 @@ INSTALL CHISEL ON BOTH CLIENT AND SERVER - the install systemd services.
 For VULTR VPS
 ufw disable ; apt-get update ; apt-get dist-upgrade -yqq ; apt-get install -y golang ; go install github.com/jpillora/chisel@latest ; cp go/bin/chisel /usr/local/bin/ ; rm -rf go ; echo "Chisel installed"
 For Debian 12
-ufw disable ; apt-get update ; apt-get dist-upgrade -yqq ; apt-get install curl ; curl https://i.jpillora.com/chisel! | bash 
+ufw disable ; apt-get update ; apt-get dist-upgrade -yqq ; apt-get install curl psmisc screen  ; curl https://i.jpillora.com/chisel! | bash 
 
 SERVER/VPS SERVICE
 ---
