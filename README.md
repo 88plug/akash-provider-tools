@@ -12,7 +12,7 @@ while true; do
   # Check if the output contains the word "error"
   if [[ ! "$output" =~ "error" ]]; then
     # If there are no errors, pipe the output to jq, awk, and save it to summary_leases.log
-    echo "$output" | jq -r '["lease-owner","dseq","gseq","oseq","UAKT-block","monthly-AKT-estimate","monthly-USD-estimate", "daily-AKT-estimate", "daily-USD-estimate"], (.leases[] | [(.lease.lease_id | .owner, .dseq, .gseq, .oseq), (.escrow_payment | .rate.amount, (.rate.amount|tonumber), (.rate.amount|tonumber))]) | @csv' | awk -F ',' '{if (NR==1) {$1=$1; printf $0"\n"} else {$6=(($6*((60/6.1)*60*24*30.436875))/10^6); $7=(($7*((60/6.1)*60*24*30.436875))/10^6)*0.45; $8=($6/30.436875); $9=($7/30.436875); print $0}}' | column -t > summary_leases.log
+    echo "$output" | etc | > summary_leases.log
     break
   else
     # If there is an error, print a retrying message
