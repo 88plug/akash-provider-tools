@@ -1,6 +1,12 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+
+# Delete all Namespaces in a Terminating state - can cause a stuck cluster:
+```
+kubectl get namespaces -o json | jq -r '.items[] | select(.status.phase=="Terminating") | .metadata.name' | xargs -I {} kubectl patch namespace {} --type json -p '[{"op": "remove", "path": "/metadata/finalizers"}]'
+```
+
 # Run akash command until it works
 ```
 #!/bin/bash
