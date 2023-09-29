@@ -2,8 +2,9 @@
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
 
-# Delete all Namespaces in a Terminating state - can cause a stuck cluster:
+# Delete all Pods + Namespaces in a Terminating state - can cause a stuck cluster:
 ```
+kubectl get pods --all-namespaces -o json | jq -r '.items[] | select(.metadata.deletionTimestamp != null) | "-n \(.metadata.namespace) \(.metadata.name)"' | xargs -L 1 kubectl delete pod --force --grace-period=0
 kubectl get namespaces -o json | jq -r '.items[] | select(.status.phase=="Terminating") | .metadata.name' | xargs -I {} kubectl patch namespace {} --type json -p '[{"op": "remove", "path": "/metadata/finalizers"}]'
 ```
 
