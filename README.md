@@ -1,6 +1,54 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Always keep Provider Pod and Node running no matter what
+```
+Here's the PDB for the "akash-provider":
+
+yaml
+
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: akash-provider-pdb
+  namespace: akash-services
+  annotations:
+    meta.helm.sh/release-name: akash-provider
+    meta.helm.sh/release-namespace: akash-services
+spec:
+  selector:
+    matchLabels:
+      app: akash-provider
+      app.kubernetes.io/instance: akash-provider
+      app.kubernetes.io/name: provider
+  minAvailable: 1
+
+And here's a PDB for the "akash-node-1":
+
+yaml
+
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: akash-node-1-pdb
+  namespace: akash-services
+  annotations:
+    meta.helm.sh/release-name: akash-node
+    meta.helm.sh/release-namespace: akash-services
+spec:
+  selector:
+    matchLabels:
+      akash.network/node: "1"
+      app: akash-node
+  minAvailable: 1
+
+You should apply both PDBs to ensure protection for both sets of pods:
+
+bash
+
+kubectl apply -f akash-provider-pdb.yaml
+kubectl apply -f akash-node-1-pdb.yaml
+```
 
 # Delete all Pods + Namespaces in a Terminating state - can cause a stuck cluster:
 ```
