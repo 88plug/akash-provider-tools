@@ -137,7 +137,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-Create limits.sh
+Create limits.sh to limit specific images
 ```
 #!/bin/bash
 
@@ -152,6 +152,30 @@ while read -r namespace deployment; do
     kubectl patch deployment -n "$namespace" "$deployment" -p '{"spec": {"template":{"metadata":{"annotations":{"kubernetes.io/egress-bandwidth":"50M"}}}}}'
 done <<< "$deployments"
 ```
+or create a limits.sh to limit all Akash deployments bandwidth
+```
+#!/bin/bash
+
+export KUBECONFIG=/root/kubeconfig
+
+echo "Starting to patch with 50M down and 50M up per pod"
+
+namespaces=$(kubectl get namespaces -o jsonpath='{.items[*].metadata.name}')
+
+for namespace in $namespaces; do
+    echo "Patching deployments in namespace $namespace"
+    
+    deployments=$(kubectl get deployments -n "$namespace" --selector="akash.network/namespace" -o jsonpath='{.items[*].metadata.name}')
+    
+    for deployment in $deployments; do
+        echo "Patching $deployment in namespace $namespace"
+        
+        kubectl patch deployment -n "$namespace" "$deployment" -p '{"spec": {"template":{"metadata":{"annotations":{"kubernetes.io/ingress-bandwidth":"50M"}}}}}'
+        kubectl patch deployment -n "$namespace" "$deployment" -p '{"spec": {"template":{"metadata":{"annotations":{"kubernetes.io/egress-bandwidth":"50M"}}}}}'
+    done
+done
+```
+
 Enable with
 ```
 systemctl daemon-reload
