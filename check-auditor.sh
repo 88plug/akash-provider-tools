@@ -74,8 +74,8 @@ format_value() {
 # Print the header
 echo "Akash Network Provider Auditor Signature Status"
 echo "-----------------------------------------------"
-printf "%-20s %-45s %-10s %-20s %-10s %-15s %-15s %-10s\n" "Provider" "Wallet Address" "Status" "Uptime" "CPU (cores)" "Memory" "Storage" "GPUs"
-printf "%-20s %-45s %-10s %-20s %-10s %-15s %-15s %-10s\n" "--------" "--------------" "------" "------" "-----------" "------" "-------" "----"
+printf "%-20s %-45s %-10s %-20s %-10s %-15s %-15s %-10s\n" "Provider" "Wallet Address" "Status" "Uptime" "CPU" "Memory" "Storage" "GPU"
+printf "%-20s %-45s %-10s %-20s %-10s %-15s %-15s %-10s\n" "--------" "--------------" "------" "------" "---" "------" "-------" "---"
 
 # Initialize total variables
 total_signed=0
