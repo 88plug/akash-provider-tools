@@ -1,6 +1,15 @@
 # akash-provider-tools
 A collection of tools for setting up / deploying / and managing Kubernetes clusters on Akash.Network
 
+# Fix nvidia-smi broken
+```
+First disable Secure Boot so the driver updates will work - in BIOS required to disable!
+then
+sudo apt-get update ; sudo apt-get autoremove nvidia* --purge -y ; sudo apt-get install -y nvidia-driver-535 nvidia-cuda-toolkit nvidia-container-runtime
+reboot now
+```
+
+
 # Always keep Provider Pod and Node running no matter what
 ```
 Here's the PDB for the "akash-provider":
